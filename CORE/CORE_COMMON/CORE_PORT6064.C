@@ -22,7 +22,7 @@ void service_pci1(void)
 		return;
     }
 
-    if ( KBHISR & C_D )   			// command
+    if ( KBHISR & C_D )   			// command  命令
 	{
         KBHIStep = 0;   			// command start
        	KbdNeedResponseFlag = 0;
@@ -36,7 +36,7 @@ void service_pci1(void)
 		    KBC_DataToHost(KBHIReponse);
         }
 	}
-    else        					// data
+    else        					// data  数据
     {
         KBHIData  = KBHIDIR;
 	    
@@ -84,7 +84,8 @@ void service_pci1(void)
 //-----------------------------------------------------------------------
 // Handle command 20 - Read command byte
 //-----------------------------------------------------------------------
-void Cmd_20(void)	
+void Cmd_20(void)
+	
 {
 	ResponseKBData(Ccb42);
 }
@@ -95,7 +96,8 @@ void Cmd_20(void)
 //-----------------------------------------------------------------------
 // Handle command 33 - Send Security Code On byte to host
 //-----------------------------------------------------------------------
-void Cmd_33(void)	
+void Cmd_33(void)
+	
 {
 	ResponseKBData(Pass_On);
 }
@@ -103,7 +105,8 @@ void Cmd_33(void)
 //-----------------------------------------------------------------------
 // Handle command 34 - Send Security Code Off byte to host
 //-----------------------------------------------------------------------
-void Cmd_34(void)	
+void Cmd_34(void)
+	
 {
 	ResponseKBData(Pass_Off);
 }
@@ -111,7 +114,8 @@ void Cmd_34(void)
 //-----------------------------------------------------------------------
 // Handle command 36 - Send Reject make code 1 to host
 //----------------------------------------------------------------------- 
-void Cmd_36(void)
+void Cmd_36(void)
+
 {
 	ResponseKBData(Pass_Make1);
 }
@@ -119,7 +123,8 @@ void Cmd_36(void)
 //-----------------------------------------------------------------------
 // Handle command 37 - Send Reject make code 2 to host
 //----------------------------------------------------------------------- 
-void Cmd_37(void)
+void Cmd_37(void)
+
 {
 	ResponseKBData(Pass_Make2);
 }
@@ -130,7 +135,8 @@ void Cmd_37(void)
 //-----------------------------------------------------------------------
 // Handle command 60 - Write command byte to KBC
 //-----------------------------------------------------------------------
-void Cmd_60(void)	
+void Cmd_60(void)
+	
 {
 	SetHandleCmdData(1);
 }
@@ -141,7 +147,8 @@ void Cmd_60(void)
 //-----------------------------------------------------------------------
 // Handle command 73 - Write security Code On byte. 
 //-----------------------------------------------------------------------
-void Cmd_73(void)	
+void Cmd_73(void)
+	
 {
 	SetHandleCmdData(1);
 }
@@ -149,7 +156,8 @@ void Cmd_73(void)
 //-----------------------------------------------------------------------
 // Handle command 74 - Write security Code Off byte. 
 //-----------------------------------------------------------------------
-void Cmd_74(void)	
+void Cmd_74(void)
+	
 {
 	SetHandleCmdData(1);
 }
@@ -157,7 +165,8 @@ void Cmd_74(void)
 //-----------------------------------------------------------------------
 // Handle command 76 - Write Password Code Discard 1
 //-----------------------------------------------------------------------
-void Cmd_76(void)
+void Cmd_76(void)
+
 {
 	SetHandleCmdData(1);
 }
@@ -165,7 +174,8 @@ void Cmd_76(void)
 //-----------------------------------------------------------------------
 // Handle command 77 - Write Password Code Discard 2
 //-----------------------------------------------------------------------
-void Cmd_77(void)
+void Cmd_77(void)
+
 {
 	SetHandleCmdData(1);
 }
@@ -176,7 +186,8 @@ void Cmd_77(void)
 //-----------------------------------------------------------------------
 // Handle command 90 - 
 //-----------------------------------------------------------------------
-void Cmd_90(void)	
+void Cmd_90(void)
+	
 {
 	SetHandleCmdData(1);
 }	
@@ -184,7 +195,8 @@ void Cmd_90(void)
 //-----------------------------------------------------------------------
 // Handle command 91 - 
 //-----------------------------------------------------------------------
-void Cmd_91(void)	
+void Cmd_91(void)
+	
 {
 	SetHandleCmdData(1);
 }
@@ -192,7 +204,8 @@ void Cmd_91(void)
 //-----------------------------------------------------------------------
 // Handle command 92 - 
 //-----------------------------------------------------------------------
-void Cmd_92(void)	
+void Cmd_92(void)
+	
 {
 	SetHandleCmdData(1);
 }
@@ -200,7 +213,8 @@ void Cmd_92(void)
 //-----------------------------------------------------------------------
 // Handle command 93 - 
 //-----------------------------------------------------------------------
-void Cmd_93(void)	
+void Cmd_93(void)
+	
 {
 	SetHandleCmdData(1);
 }
@@ -208,7 +222,8 @@ void Cmd_93(void)
 //-----------------------------------------------------------------------
 // Handle command 97 - 
 //-----------------------------------------------------------------------
-void Cmd_97(void)	
+void Cmd_97(void)
+	
 {
 	SetHandleCmdData(1);
 }
@@ -220,7 +235,8 @@ void Cmd_97(void)
 // Handle command A4 - Test Password Installed
 // Return: data to send to HOST (FA or F1)
 //-----------------------------------------------------------------------
-void Cmd_A4(void)	
+void Cmd_A4(void)
+	
 {
     if (Flag.PASS_READY) 
 	{
@@ -235,7 +251,8 @@ void Cmd_A4(void)
 //-----------------------------------------------------------------------
 // Handle command A5 - Load Password
 //----------------------------------------------------------------------- 
-void Cmd_A5(void)
+void Cmd_A5(void)
+
 {
 	Tmp_Load = 0x00;
 	SetHandleCmdData(8);
@@ -244,7 +261,8 @@ void Cmd_A5(void)
 //-----------------------------------------------------------------------
 // Handle command A6 - Enable Password
 //-----------------------------------------------------------------------
-void Cmd_A6(void)
+void Cmd_A6(void)
+
 {
     if (Flag.PASS_READY)			// At this point, a password is loaded.
     {   							// Enable inhibit switch      
@@ -262,7 +280,8 @@ void Cmd_A6(void)
 //-----------------------------------------------------------------------
 // Handle command A7 - Disable Aux Device Interface
 //-----------------------------------------------------------------------
-void Cmd_A7(void)
+void Cmd_A7(void)
+
 {
 	Ccb42_DISAB_AUX = 1;   // Disable auxiliary device (mouse)	
 }
@@ -270,7 +289,8 @@ void Cmd_A7(void)
 //-----------------------------------------------------------------------
 // Handle command A8 - Enable Auxiliary Device Interface
 //-----------------------------------------------------------------------
-void Cmd_A8(void)
+void Cmd_A8(void)
+
 {
 	Ccb42_DISAB_AUX = 0; 	// Enable aux device (mouse) 
 }
@@ -284,7 +304,8 @@ void Cmd_A8(void)
 //             3 = Data line stuck low
 //             4 = Data line stuck high
 //-----------------------------------------------------------------------
-void Cmd_A9(void)
+void Cmd_A9(void)
+
 {
     MULPX_Multiplex = 0;
 	ResponseKBData(0x00);
@@ -294,7 +315,8 @@ void Cmd_A9(void)
 // Handle command AA - Self Test
 // Returns: 0x55 to signify that the test passed
 //-----------------------------------------------------------------------
-void Cmd_AA(void)
+void Cmd_AA(void)
+
 {
     #if TouchPad_only
     ScanAUXDevice(ScanMouseChannel);    // Scan Mouse channel
@@ -317,7 +339,8 @@ void Cmd_AA(void)
 //             3 = Data line stuck low
 //             4 = Data line stuck high
 //-----------------------------------------------------------------------
-void Cmd_AB(void)
+void Cmd_AB(void)
+
 {
 	ResponseKBData(0x00);
 }
@@ -325,7 +348,8 @@ void Cmd_AB(void)
 //-----------------------------------------------------------------------
 // Handle command AC - Diagnostic Dump
 //-----------------------------------------------------------------------
-void Cmd_AC(void)	
+void Cmd_AC(void)
+	
 {
    	//Kbd_Response = respCMD_AC;// Send multibyte sequence.
    	//Tmp_Byte[0] = 0;			// Tmp_Byte[0] will be used as the index for data.
@@ -334,7 +358,8 @@ void Cmd_AC(void)
 //-----------------------------------------------------------------------
 // Handle command AD - Disable Keyboard Interface
 //-----------------------------------------------------------------------
-void Cmd_AD(void)
+void Cmd_AD(void)
+
 {
     Ccb42_DISAB_KEY = 1;   		// Disable auxiliary keyboard.
     Flag.SCAN_INH = 1;         	// Inhibit scanner (internal keyboard).
@@ -345,7 +370,8 @@ void Cmd_AD(void)
 //-----------------------------------------------------------------------
 // Handle command AE - Enable Keyboard Interface
 //-----------------------------------------------------------------------
-void Cmd_AE(void)
+void Cmd_AE(void)
+
 {
    	Ccb42_DISAB_KEY = 0;   		// Enable auxiliary keyboard.
    	Flag.SCAN_INH = 0;  		// Enable scanner (internal keyboard).
@@ -354,7 +380,8 @@ void Cmd_AE(void)
 //-----------------------------------------------------------------------
 // Handle command AF - 
 //-----------------------------------------------------------------------
-void Cmd_AF(void)
+void Cmd_AF(void)
+
 {
 
 }
@@ -375,7 +402,8 @@ void Cmd_AF(void)
 // Handle command C0 - Emulate reading the 8042 Input port and send data 
 //					 	to the system
 //-----------------------------------------------------------------------
-void Cmd_C0(void)	
+void Cmd_C0(void)
+	
 { 
 	ResponseKBData(0xBF);	//  Just return the compatibility value for now. //return (PCIN | 0x1F);
 }
@@ -385,9 +413,10 @@ void Cmd_C0(void)
 //-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
 // Handle command D0 - Send 8042 Output port value to the system 
-//						(emulates data since there��s no real Output port)
+//						(emulates data since there��s no real Output port)
 //-----------------------------------------------------------------------
-void Cmd_D0(void)	
+void Cmd_D0(void)
+	
 {
 	ResponseKBData(Read_Output_Port_2());
 }
@@ -395,7 +424,8 @@ void Cmd_D0(void)
 //-----------------------------------------------------------------------
 // Handle command D1 - Only set/reset GateA20 line based on the System Data bit1.
 //-----------------------------------------------------------------------
-void Cmd_D1(void)	
+void Cmd_D1(void)
+	
 {	
 	FastA20=1;
 	//SetHandleCmdData(1);
@@ -404,7 +434,8 @@ void Cmd_D1(void)
 //-----------------------------------------------------------------------
 // Handle command D2 - Send data to the system as if it came from the keyboard.
 //-----------------------------------------------------------------------
-void Cmd_D2(void)	
+void Cmd_D2(void)
+	
 {
     TR1 = 0;                 	// Disable timer1
     ET1 = 0;                  	// Disable timer1 interrupt
@@ -442,7 +473,8 @@ void Cmd_D2(void)
 //-----------------------------------------------------------------------
 // Handle command D3 - Send data to the system as if it came from the auxiliary device.
 //-----------------------------------------------------------------------
-void Cmd_D3(void)	
+void Cmd_D3(void)
+	
 {
     TR1 = 0;                 	// Disable timer1
     ET1 = 0;                  	// Disable timer1 interrupt
@@ -484,7 +516,8 @@ void Cmd_D3(void)
 //-----------------------------------------------------------------------
 // Handle command D4 - Output next received byte of data from system to auxiliary device.
 //-----------------------------------------------------------------------
-void Cmd_D4(void)	
+void Cmd_D4(void)
+	
 {
 	SetHandleCmdData(1);
 	MULPX_Multiplex = 0;		// Dino MUX ps2
@@ -496,7 +529,8 @@ void Cmd_D4(void)
 //-----------------------------------------------------------------------
 // Handle command E0 - Reports the state of the test inputs
 //-----------------------------------------------------------------------
-void Cmd_E0(void)				
+void Cmd_E0(void) 
+				
 {
 	ResponseKBData(0x00);
 }
