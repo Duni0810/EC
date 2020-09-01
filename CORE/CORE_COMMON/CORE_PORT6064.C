@@ -362,7 +362,7 @@ void Cmd_AD(void)
 
 {
     Ccb42_DISAB_KEY = 1;   		// Disable auxiliary keyboard.
-    Flag.SCAN_INH = 1;         	// Inhibit scanner (internal keyboard).
+    Flag.SCAN_INH = 1;         	// Inhibit scanner (internal keyboard). 禁止扫描传输
     Lock_Scan();              	// Lock scanner. 
     //Load_Timer_B();			// Start inhibit delay timer. 
 }
@@ -529,7 +529,7 @@ void Cmd_D4(void)
 //-----------------------------------------------------------------------
 // Handle command E0 - Reports the state of the test inputs
 //-----------------------------------------------------------------------
-void Cmd_E0(void) 
+void Cmd_E0(void)
 				
 {
 	ResponseKBData(0x00);
@@ -604,14 +604,14 @@ void Cmd_60Data(void)
 
 	if (Ccb42_DISAB_KEY) 
 	{
-    	Cmd_AD();		// Disable keyboard interface. 
+    	Cmd_AD();		// Disable keyboard interface.  禁能键盘接口
 	}
 	else 
 	{
-     	Cmd_AE(); 		// Enable keyboard interface. 
+     	Cmd_AE(); 		// Enable keyboard interface.   使能键盘接口
  	}
 
-            
+    // 主机接口状态寄存器
 	if (Ccb42_SYS_FLAG)	// Put system flag bit in Status Reg.
   		SET_MASK(KBHISR,SYSF);
   	else
@@ -1305,15 +1305,15 @@ void Core_60Port(BYTE KBHIData)
     switch(KBHIData)
     {
         case 0x60:
-        Cmd_60Data();
+        Cmd_60Data();   // Write command byte 写指令字节
         break;
 
         case 0x73:
-        Cmd_73Data();
+        Cmd_73Data();  // Write Security Code On byte 用字节写安全代码？
         break;
 
         case 0x74:
-        Cmd_74Data();
+        Cmd_74Data();  // Write Security Code Off byte 写入安全代码
         break;
 
         case 0x76:
