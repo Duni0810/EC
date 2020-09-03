@@ -25,7 +25,6 @@ void Loop_Delay(BYTE delay)
     {
         delay--;
     }
-
 }
 
 
@@ -86,33 +85,38 @@ void ACPI_Cmd_06(void)
 //----------------------------------------------------------------------------
 // Handle ACPI command 8x.
 //----------------------------------------------------------------------------
-void ACPI_Cmd_80(void)	// Read Embedded Controller.
+void ACPI_Cmd_80(void)
+	// Read Embedded Controller.
 {
 	//J80_013--	ACPI_Gen_Int(ACPICmdSCI);
 	PM1Step =0x01;
 	//RamDebug(0X77);
 }
 
-void ACPI_Cmd_81(void)	// Write Embedded Controller.
+void ACPI_Cmd_81(void)
+	// Write Embedded Controller.
 {
  	//J80_013--	ACPI_Gen_Int(ACPICmdSCI);
   	PM1Step =0x02;
 }
 
-void ACPI_Cmd_82(void)	// Burst Enable Embedded Controller.
+void ACPI_Cmd_82(void)
+	// Burst Enable Embedded Controller.
 {
 	//Delay1MS(1);			//delay 1ms cause SYN TP fail!!
 	SET_MASK(PM1STS,BURST); // PM1STS.4 Set Burst mode flag
  	SendFromAcpi(0x90);		// Get Burst Acknowledge byte to send to Host. 
 }
 
-void ACPI_Cmd_83(void)	// Burst Disable Embedded Controller.
+void ACPI_Cmd_83(void)
+	// Burst Disable Embedded Controller.
 {
 	CLEAR_MASK(PM1STS,BURST); 	// PM1STS.4 Set Burst mode flag
  	//J80_013--	ACPI_Gen_Int(ACPICmdSCI);   // Clear Burst bit in secondary Host interface status register.
 }
 
-void ACPI_Cmd_84(void)	// Query Embedded Controller.
+void ACPI_Cmd_84(void)
+	// Query Embedded Controller.
 {
 
 }
@@ -120,12 +124,14 @@ void ACPI_Cmd_84(void)	// Query Embedded Controller.
 //----------------------------------------------------------------------------
 // Handle ACPI command 9x.
 //----------------------------------------------------------------------------
-void ACPI_Cmd_92(void)		// Oem function of reading EC external ram
+void ACPI_Cmd_92(void)		// Oem function of reading EC external ram
+
 {
 	PM1Step = 0x02;
 }
 
-void ACPI_Cmd_93(void)		// Oem function of writing EC external ram
+void ACPI_Cmd_93(void)		// Oem function of writing EC external ram
+
 {
 	PM1Step =0x03;
 }
@@ -158,7 +164,8 @@ void SendFromAcpi(BYTE ecdata)
 //----------------------------------------------------------------------------
 // Handle the data of ACPI command 8x
 //----------------------------------------------------------------------------
-void ACPI_Cmd_80Data(void)
+void ACPI_Cmd_80Data(void)
+
 {
 	if (PM1Step == 1)
 	{
@@ -167,7 +174,8 @@ void ACPI_Cmd_80Data(void)
 	}
 }
 
-void ACPI_Cmd_81Data(void)
+void ACPI_Cmd_81Data(void)
+
 {
  	//J80_013--	ACPI_Gen_Int(ACPICmdSCI);
   	if (PM1Step == 2)
@@ -181,17 +189,20 @@ void ACPI_Cmd_81Data(void)
  	}
 }
 
-void ACPI_Cmd_82Data(void)
+void ACPI_Cmd_82Data(void)
+
 {
 
 }
 
-void ACPI_Cmd_83Data(void)
+void ACPI_Cmd_83Data(void)
+
 {
 
 }
 
-void ACPI_Cmd_84Data(void)
+void ACPI_Cmd_84Data(void)
+
 {
 
 }
@@ -199,7 +210,8 @@ void ACPI_Cmd_84Data(void)
 //----------------------------------------------------------------------------
 // Handle the data of ACPI command 9x
 //----------------------------------------------------------------------------
-void ACPI_Cmd_92Data(void)
+void ACPI_Cmd_92Data(void)
+
 {
 	switch(PM1Step)
 	{
@@ -216,7 +228,8 @@ void ACPI_Cmd_92Data(void)
 	}
 }
 
-void ACPI_Cmd_93Data(void)
+void ACPI_Cmd_93Data(void)
+
 {
 	if (PM1Step==0x03)
 	{

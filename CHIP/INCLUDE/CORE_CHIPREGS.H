@@ -1068,15 +1068,15 @@ extern ECReg	TMEIE			;// 0x290C  TMR Interrupt Enable Register
 #define	IRQ12B				BIT(1)	// IRQ12 Control Bit
 #define	IRQ1B				BIT(0)	// IRQ1 Control Bit
 
-// KBC Host Interface Keyboard/Mouse Status Register
-#define PARE    			BIT(7)	// Programming Data
-#define GTIM    			BIT(6)	// Programming Data
-#define AOBF    			BIT(5)	// Programming Data
-#define KEYL    			BIT(4)	// Programming Data
-#define C_D     			BIT(3)	// Command or data port
-#define SYSF    			BIT(2)	// Programming Data (System flag)
-#define	IBF					BIT(1)	// Input Buffer Full
-#define	OBF					BIT(0)	// Output Buffer Full
+// KBC Host Interface Keyboard/Mouse Status Register  1304
+#define PARE    			BIT(7)	// Programming Data      从键获得的数据奇偶校验错误
+#define GTIM    			BIT(6)	// Programming Data      接收超时， 置1
+#define AOBF    			BIT(5)	// Programming Data      发送超时， 置1
+#define KEYL    			BIT(4)	// Programming Data      为1，键盘没有被禁止。为0，键盘被禁止。      
+#define C_D     			BIT(3)	// Command or data port  为1，输入缓冲器中的内容为命令，为0，输入缓冲器中的内容为数据。
+#define SYSF    			BIT(2)	// Programming Data (System flag) 系统标志，加电启动置0，自检通过后置1
+#define	IBF					BIT(1)	// Input Buffer Full     输入缓冲器满置1，i8042 取走后置0
+#define	OBF					BIT(0)	// Output Buffer Full    输出缓冲器满置1，CPU读取后置0
 
 //-----------------------------------------------------------------------------
 // (15xxh) Power Management Channel (PMC) 

@@ -62,7 +62,7 @@ BYTE scan_keys(void)
         for (ITempB03=0;ITempB03<16;ITempB03++)
         {
         	Write_Strobe(ITempB03);
-			CapDelay();         // 这里是延时一个市政周期
+			CapDelay();         // 这里是延时一个时间周期
          	ITempB02 = KSI; 	// Read in KI 0 - 7 sense line data.  default is High
 			//-----------------------------------
 			//Label:BLD_TIPIA_20160827_005

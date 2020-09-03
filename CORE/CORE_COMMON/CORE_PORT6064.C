@@ -22,7 +22,7 @@ void service_pci1(void)
 		return;
     }
 
-    if ( KBHISR & C_D )   			// command  命令
+    if ( KBHISR & C_D )   			// command  命令 
 	{
         KBHIStep = 0;   			// command start
        	KbdNeedResponseFlag = 0;
@@ -575,10 +575,6 @@ void Cmd_FX(void)
 
 	
     }							// Odd command do no thing	
-
-	
-
-
 }
 
 //-----------------------------------------------------------------------
@@ -694,7 +690,7 @@ void Cmd_90Data(void)			// always send timeout error to system
 
     DelayXms(5);				    // Emulate transmission delay times 
     KBHIMDOR = 0xFC;			    // timeout error  
-	ShortDelayAfterWriteDOR();
+	ShortDelayAfterWriteDOR();       
     Hook_Mouse_90Cmd(KBHIData);
 }
 
@@ -1317,11 +1313,11 @@ void Core_60Port(BYTE KBHIData)
         break;
 
         case 0x76:
-        Cmd_76Data();
+        Cmd_76Data();  // 弹起通码1  Reject make code 1
         break;
 
         case 0x77:
-        Cmd_77Data();
+        Cmd_77Data();  // 弹起通码2 Reject make code 2
         break;
 
         case 0x90:

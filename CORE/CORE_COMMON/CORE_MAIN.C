@@ -43,7 +43,7 @@ void main(void)
 	{
 		CLEAR_MASK(FBCFG,SSMC); // disable scatch ROM ; FBCFG: flash bus config  为了兼容8510
 
-        // 与手册中的一致 page209
+        // 与手册中的一致 page209 这个是为了清空 cache
 		_nop_();
 	    MPRECF = 0x01;          // MPRECF 手动预取计数  清除内部动态缓存
 	    _nop_();
@@ -142,7 +142,9 @@ void main_service(void)
     #endif
     {
         //-----------------------------------
-        // Host command/data service    6064
+        // Host command/data service    6064 
+        // 通过KBC接口处理来自系统的命令/数据
+        // 表示有6064 服务数据需要发送
         //-----------------------------------
         if(F_Service_PCI)
         {
@@ -152,7 +154,7 @@ void main_service(void)
         }
 
         //-----------------------------------
-        // Service unlock
+        // Service unlock 不运行 参数 F_Service_UNLOCK  没被初始化
         //-----------------------------------
         if(F_Service_UNLOCK)
         {
@@ -183,6 +185,7 @@ void main_service(void)
 
         //-----------------------------------
         // process PS2 interface data
+        // 这个PS2 好像是 鼠标的服务函数
         //-----------------------------------
         if(F_Service_PS2)
         {
@@ -193,6 +196,7 @@ void main_service(void)
 
         //-----------------------------------
         // process SMBus interface data
+        // SMBus 服务函数
         //-----------------------------------
         #ifdef SMBusServiceCenterFunc
 		
@@ -205,6 +209,7 @@ void main_service(void)
 
         //-----------------------------------
         // Secondary Host command/data service
+        // PM1 相关
         //-----------------------------------
         if(F_Service_PCI2)
         {
@@ -215,7 +220,8 @@ void main_service(void)
 
 
         //-----------------------------------
-        // 1 millisecond elapsed
+        // 1 millisecond elapsed  事件轮训状态查询并使能
+        // 这个函数比较重要
         //-----------------------------------
         if(F_Service_MS_1)
         {
@@ -226,7 +232,8 @@ void main_service(void)
 
 
         //-----------------------------------
-        // Keyboard scanner service
+        // Keyboard scanner service 5ms 事件 
+        // 执行键盘扫描操作 ,将扫描到的键值进行处理获取键码 存入buffer
         //-----------------------------------
         if(F_Service_KEY)
         {
@@ -236,12 +243,12 @@ void main_service(void)
         }
 
         //-----------------------------------
-        //
+        // 空函数  只是保留在这里
         //-----------------------------------
         Hook_main_service_H();
         
         //-----------------------------------
-        // Low level event
+        // Low level event  5ms 事件
         //-----------------------------------
         if(F_Service_Low_LV)
         {
@@ -251,7 +258,8 @@ void main_service(void)
         } 
 
         //-----------------------------------
-        // Third Host command/data service
+        // Third Host command/data service PMC PM2相关
+        // 输入buffer 满中断
         //-----------------------------------
         if(F_Service_PCI3)
         {
@@ -261,7 +269,7 @@ void main_service(void)
         }
 
         //-----------------------------------
-        // CIR IRQ
+        // CIR IRQ  空函数 没使用
         //-----------------------------------
         if(F_Service_CIR)
         {
@@ -271,7 +279,7 @@ void main_service(void)
         }
 
         //-----------------------------------
-        // fourth command/data service
+        // fourth command/data service  PM3 相关
         //-----------------------------------
         if(F_Service_PCI4)
         {
@@ -280,7 +288,7 @@ void main_service(void)
             continue;
         }
 
-        // 关于OEM1-4 的服务函数都没有函数
+        // 下面的行数都没有使用
         //------------------------------------
         // service_OEM_1
         //------------------------------------
@@ -407,7 +415,7 @@ void service_1mS(void)
               	    break;
      	    }
 
-    	    if ( Timer5msCnt == 0x00 )
+    	    if ( Timer5msCnt == 0x00 )  // default 事件
     	    {       			// 50msec
           	    Timer100msCnt ++;
           	    if ( Timer100msCnt & 1 )

@@ -723,6 +723,7 @@ void SPI_Read_256Bytes(void)
 
 //-----------------------------------------------------------------------------
 // The function of loading function to external ram 0x600 ~ 0x6FF
+// 这个好像是将这个函数开始的地址之后的256字节加载
 //-----------------------------------------------------------------------------
 void LoadSPIFucnToRam(FUNCT_PTR_V_V funcpoint)
 {

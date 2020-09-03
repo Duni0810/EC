@@ -79,7 +79,7 @@ void KBC_DataPending(BYTE nPending)
 
     KBDataPending[(KBPendingRXCount&0x03)] = nPending;
     KBPendingRXCount++;
-    SetServiceSendFlag();
+    SetServiceSendFlag();  // 2ms事件
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +165,8 @@ void SetServiceSendFlag(void)
  * Send scan codes from scanner keyboard to the Host.  Also handle multiple
  * byte transmissions for standard commands and extended commands that return
  * more than one byte to the Host.
+ * 
+ * 将扫描代码从键盘发送到主机，还可以处理向主机返回一个以上的标准指令和扩张命令的多字节传输
  *
  * When sending multiple bytes, the 1st byte is sent immediately, but the
  * remaining bytes are sent by generating another send request via the
@@ -172,6 +174,11 @@ void SetServiceSendFlag(void)
  * If more bytes are to be sent, "Start_Scan_Transmission" will start Timer A,
  * and the Timer A interrupt handler will generate the send request when the
  * response timer has expired!
+ *     当发送多个字节时，第一个字节立即发送，但是剩余的字节通过“ handle_unlock”函数生成另一
+ * 个发送请求来发送，该函数将调用“ Start_Scan_Transmission”。 如果要发送更多字节，则“ 
+ * Start_Scan_Transmission”将启动定时器A，并且当响应定时器到期时，定时器A中断处理程序将生
+ * 成发送请求！
+ * 
  * ------------------------------------------------------------------------- */
 void service_send(void)
 {
@@ -181,8 +188,9 @@ void service_send(void)
 
  	//Load_Timer_B();
  	//Timer_B.fbit.SEND_ENABLE = 1;
- 	SetServiceSendFlag();
+ 	SetServiceSendFlag();  // 是能定时器1
 	
+    // 判断buffer 是否满
     if( IS_MASK_SET(KBHISR,OBF) || IS_MASK_SET(KBHISR,IBF) )
     //if(IS_MASK_SET(KBHISR,OBF))
     {

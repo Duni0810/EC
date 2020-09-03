@@ -396,6 +396,7 @@ void ProcessECTestAUXACK(BYTE PortNum, BYTE enablenow)
 
 //-----------------------------------------------------------------
 // Bypass AUX data to host
+// 发送鼠标数据
 //-----------------------------------------------------------------
 void SendAUXData(BYTE PortNum)  // Dino 0907             
 {

@@ -1062,7 +1062,7 @@ void Isr_Int1 (void) interrupt 2 using 2
         }
         else
         {
-            // 这里减去0x10 是手册里面要求最小为0x10
+            // 这里减去0x10 是手册里面要求最小为0x10 page 219
             (IRQ_Service[(IVECT-0x10)&0x7F])();   // Dispatch to service handler.
         }
     }
@@ -1075,7 +1075,7 @@ void Isr_Int1 (void) interrupt 2 using 2
 void Isr_Tmr1(void) interrupt 3 using 2
 {
 	Stop_Timer_B();
-	if ( Timer_B.fbit.SEND_ENABLE )  
+	if ( Timer_B.fbit.SEND_ENABLE )   // 这里的使能在按键
  	{   
    		F_Service_SEND = 1;     		// Post service request.
      	Timer_B.fbit.SEND_ENABLE = 0;

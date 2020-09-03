@@ -263,7 +263,7 @@ extern 	XBYTE	PS2TypeCounter;	// Dino 1128
 extern 	XBYTE	WinFlashMark;
 extern 	XBYTE	RamCodePort;	
 
-extern  XBYTE   KBDataPending[];            //_at_ 0x47;
+extern  XBYTE   KBDataPending[];            //_at_ 0x47;  4字节
 extern  XBYTE   KBPendingRXCount;           //_at_ 0x4B;
 extern  XBYTE   KBPendingTXCount;           //_at_ 0x4C;
 extern  XBYTE	PS2DataPinStatus;		    //_at_ 0x4D;
