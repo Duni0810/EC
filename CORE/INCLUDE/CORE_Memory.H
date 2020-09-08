@@ -44,7 +44,7 @@
 #define LED7    	bit7
 
 extern	IBYTE	KBHICmd;
-extern	IBYTE 	KBHIStep;
+extern	IBYTE 	KBHIStep;  // 感觉像是处理指令的步骤记录
 extern	IBYTE	KBHIData;
 extern	IBYTE 	KBHIData1;
 extern	IBYTE 	KBHIData2;

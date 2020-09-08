@@ -375,8 +375,9 @@ void Hook_Timer1SecEventC(void)
 	//MoniterTemprature();
 
 	#if ADCFuncSupport
-	if(SystemIsS0)
+	if(SystemIsS0)  // 正常开机工作状态
 	{
+		// 获取热敏电阻阻值
 		Get_Thermistor0_data();
 		Get_Thermistor1_data();
 		Get_Thermistor7_data();
@@ -468,8 +469,10 @@ void Hook_main_service_L(void)
 //------------------------------------------------------------
 BYTE Hook_Only_Timer1msEvent(void)
 {
+	// 关机
     if((SysPowState==SYSTEM_S5_S0)||(SysPowState==SYSTEM_S4_S0)||(SysPowState==SYSTEM_S3_S0))
     {
+		// 长按 4.4s 关机
         if(++PowerOnWDT >4400)  // > 4.4 sec
         {
             PowerOnWDT = 0x00;

@@ -17,41 +17,46 @@
 //-----------------------------------------------------------------------
 void service_pci1(void)
 {
+    // 先判断输入buffer 满状态
     if ( IS_MASK_CLEAR(KBHISR,IBF) )  
 	{	
 		return;
     }
 
+    // 命令
     if ( KBHISR & C_D )   			// command  命令 
 	{
         KBHIStep = 0;   			// command start
        	KbdNeedResponseFlag = 0;
- 		KBHICmd  = KBHIDIR;
+ 		KBHICmd  = KBHIDIR;   //  输入寄存器的值 赋值，这里是指令值
         
-        Core_64Port(KBHICmd);
-        Hook_64Port(KBHICmd);
+        Core_64Port(KBHICmd);  // 处理指令值
+        Hook_64Port(KBHICmd);  // 这个钩子函数做的事处理厂商定义
+
+        // 判断指令是否需要相应，并且KBC发送数据给主机
  	    if ( KbdNeedResponseFlag ) 
 	    {
 		    KbdNeedResponseFlag = 0;
 		    KBC_DataToHost(KBHIReponse);
         }
-	}
-    else        					// data  数据
-    {
+	}  else {   // data  数据
+        // 读取数据
         KBHIData  = KBHIDIR;
 	    
+        // Cmd_D1中  在  64 port 
+
 	    if(FastA20)
 	    {
 		    if((KBHIData&0x02)!= 0x00)
 		    {
-  			    Hook_A20ON();
+  			    Hook_A20ON();  // 空函数
 		    }
 		    else
 		    {
     		    //Hook_A20OFF();
 		    }
 		    FastA20=0;
-		    KBHIStep = 0;
+		    KBHIStep = 0;  // 结束 D1指令的操作
 	    }
         else
         {
@@ -60,6 +65,8 @@ void service_pci1(void)
         	    Core_60Port(KBHICmd);
                 Hook_60Port(KBHICmd);
 			    KBHIStep --;
+
+                // 如果主机要求有相应(ACK)
         	    if (KbdNeedResponseFlag)
 			    {
 				    KbdNeedResponseFlag = 0;

@@ -420,7 +420,7 @@ void SX_S0CommVar(void)
 }
 
 //-----------------------------------------------------------------------------
-// The variable of S5 -> S0
+// The variable of S5 -> S0  开机状态
 //-----------------------------------------------------------------------------
 void S5_S0Variable(void)
 {
@@ -506,7 +506,7 @@ void S0_SXCommVar(void)
 }
 
 //-----------------------------------------------------------------------------
-//  The variable of S0 -> S5
+//  The variable of S0 -> S5  关机状态
 //-----------------------------------------------------------------------------
 void S0_S5Variable(void)
 {
@@ -802,8 +802,8 @@ void Oem_TriggerS0S5(BYTE causecode)
 
 //-----------------------------------------------------------------------------
 // process POWER OFF sequence
-// entry: 	1�Bpower shutdown case
-//			2�BS5 off or not
+// entry: 	1�Bpower shutdown case
+//			2�BS5 off or not
 // Shutdown cause:
 //	1:	0x8A command of 66 port
 // 	2:	0x8B command of 66 port

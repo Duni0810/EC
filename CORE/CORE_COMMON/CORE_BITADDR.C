@@ -6,16 +6,22 @@
  *---------------------------------------------------------------------------*/
 
 //----------------------------------------------------------------------------
-// Bit addressing variables [0x20-0x2F]
+// Bit addressing variables [0x20-0x2F]  和共用体类似操作，这里是位操作
 //----------------------------------------------------------------------------
+
+
+// Command Byte不能直接通过60h和64端口读取，若要访问它，
+//必须首先通过64h端口向8042发布相应命令（20h/read,60h/write），然后再通过60h存取
+// commnand byte
+// 状态寄存器
 volatile unsigned char bdata Ccb42 _at_ 0x20;
-sbit Ccb42_INTR_KEY  = Ccb42^0;
-sbit Ccb42_INTR_AUX  = Ccb42^1;
-sbit Ccb42_SYS_FLAG  = Ccb42^2;
-sbit Ccb42_RV1       = Ccb42^3;
-sbit Ccb42_DISAB_KEY = Ccb42^4;
-sbit Ccb42_DISAB_AUX = Ccb42^5;
-sbit Ccb42_XLATE_PC  = Ccb42^6;
+sbit Ccb42_INTR_KEY  = Ccb42^0;  // enable 键盘中断
+sbit Ccb42_INTR_AUX  = Ccb42^1;  // enable 鼠标中断
+sbit Ccb42_SYS_FLAG  = Ccb42^2;  // 1=set status register system, 0=clear ??  设置状态寄存器中的 Bit2??
+sbit Ccb42_RV1       = Ccb42^3;  // 忽略状态寄存器中的 Bit4
+sbit Ccb42_DISAB_KEY = Ccb42^4;  // 禁止键盘
+sbit Ccb42_DISAB_AUX = Ccb42^5;  // 禁止鼠标
+sbit Ccb42_XLATE_PC  = Ccb42^6;  // 好像是将第二套扫描码翻译为第一套
 sbit Ccb42_RV2       = Ccb42^7;
                                     //Reserved 0x21
 
@@ -111,8 +117,8 @@ sbit Gen_Info_BREAK_SCAN  = Gen_Info^7;
 
 volatile unsigned char bdata Kbd_Response _at_ 0x2B;
 // Don't use bit0 ~ bit5
-sbit Kbd_Response_SECOND_ACK   = Kbd_Response^6;
-sbit Kbd_Response_CMD_RESPONSE = Kbd_Response^7;
+sbit Kbd_Response_SECOND_ACK   = Kbd_Response^6;  // 没使用
+sbit Kbd_Response_CMD_RESPONSE = Kbd_Response^7;  // 这个版本没使用
 
 volatile unsigned char bdata AuxScanFlagS _at_ 0x2C;
 sbit SendtoAUXFlag			= AuxScanFlagS^0;	
@@ -124,6 +130,8 @@ sbit AuxScanFlagS_RV3       = AuxScanFlagS^5;
 sbit AuxScanFlagS_RV1       = AuxScanFlagS^6;
 sbit AuxScanFlagS_RV2       = AuxScanFlagS^7;
 
+
+// 这个参数没有被定义，但是下面的bit 位置有被定义
 volatile unsigned char bdata CustomFlag _at_ 0x2D;
 sbit KbdNeedResponseFlag	= CustomFlag^0;
 sbit ExtendMatrix			= CustomFlag^1;

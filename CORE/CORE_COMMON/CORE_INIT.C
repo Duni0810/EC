@@ -35,7 +35,7 @@ void cold_reset(void)
     Flag.NEW_PRI_M = 0;
 
     Flag.LED_ON = 1;
-    Ccb42 = CCB42_INIT;
+    Ccb42 = CCB42_INIT; // 禁能键盘
 
     Pass_On = 0;      /* Password enable send code. */
     Pass_Off = 0;     /* Password disable send code. */

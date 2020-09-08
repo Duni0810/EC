@@ -57,8 +57,10 @@ void Send_Scan2(union KEY key, BYTE event)
     	ITempB04 = (key.field.input << 4) | key.field.output;
 
         // 这里做的是基址 + 偏移量的事情， 其中Scanner_Table_Pntr 为键表的基址，这样就能唯一锁定键盘键值
+        // 这里可能有键盘的映射关系
 		ITempB03 = *(Scanner_Table_Pntr + ITempB04);    //matrix code To Scan Code Set 2
 
+        // 睡眠唤醒
 		Hook_keyboard(key.field.input, key.field.output); // wake up System from S3
 		
     	Send_Key(ITempB03, event);
@@ -69,22 +71,29 @@ void Send_Scan2(union KEY key, BYTE event)
 /* ----------------------------------------------------------------------------
  * FUNCTION: Send_Key
  * ------------------------------------------------------------------------- */
+// table 表示RC_table数值， event 表示通码，断码或者repeat
 void Send_Key(BYTE table_entry, BYTE event)
 {
     BYTE temp;
     const BYTE code *pntr;
     BYTE temp_table_entry;
 
+    // 这个函数里面会判断是不是S0状态，而后又热键判断，但是这个热键不知道有什么用
     OEM_Hook_Send_Key(table_entry,event);
 
+    // 不会执行这个if，因为返回值为0x00
     if(OEM_Hook_Skip_Send_Key()==0xFF)
     {
         return;
     }
 
+    // 键值赋值
     temp_table_entry = table_entry;
 
+    // 标记缓冲区 以防止溢出
     Buffer_Mark();									// Mark Buffer in case of overrun.
+
+    
     temp_scanner_state.byte = Scanner_State;
 
     // 功能按键

@@ -1092,6 +1092,8 @@ const BYTE code sskey3_80_table[] =
 #define Crisiskey01        0x8E   	// Fn
 #define Crisiskey02        0x2D  	// R
 
+
+//  CrisisKeyStatus 这个参数都是作为左值得，不知道有什么意义？？？ 保留意见
 void CrisisHotkey01(BYTE event)
 {
     if(event == BREAK_EVENT)
@@ -1123,9 +1125,12 @@ const sBootHotKeyStruct code asBootHotKeyStruct[]=
 	{ Crisiskey02, CrisisHotkey02	},
 };
 
+
+// matrix 为键值 ， event为 事件(make， break or repeat code)
 void CheckBootHotKey(BYTE matrix,BYTE event)
 {
 	BYTE index;
+	//一般笔记本 Fn 为功能按键 保留功能按键R
     for(index=0x00; index<(sizeof(asBootHotKeyStruct)/sizeof(sBootHotKeyStruct)); index++)
     {
 		if(matrix==asBootHotKeyStruct[index].matrix)
@@ -1172,7 +1177,7 @@ void Et_CheckKBS3Wake(BYTE BKSI,BYTE BKSO)
 //----------------------------------------------------------------------------
 void OEM_Hook_Send_Key(BYTE table_entry, BYTE event)
 {
-    if(SystemNotS0)
+    if(SystemNotS0)  // 系统不为S0状态
     {  	
         CheckBootHotKey(table_entry,event);
     }

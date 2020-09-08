@@ -53,6 +53,10 @@
         "OEM_FAN.C": "cpp",
         "OEM_SHA1.C": "cpp",
         "OEM_LPC.C": "cpp",
-        "OEM_LED.C": "cpp"
+        "OEM_LED.C": "cpp",
+        "OEM_MMB.C": "cpp",
+        "OEM_MailBox.C": "cpp",
+        "OEM_LCD.C": "cpp",
+        "OEM_SHA11.C": "cpp"
     }
 }

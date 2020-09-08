@@ -406,9 +406,9 @@ ECReg	PWM1LCR2		_at_ 0x1855;	// PWM1 LED Dimming Control Register 2
 //-----------------------------------------------------------------------------
 // (19xxh) Analog to Digital converter (ADC) 
 //-----------------------------------------------------------------------------
-ECReg	ADCSTS			_at_ 0x1900;	// ADC Status
-ECReg	ADCCFG			_at_ 0x1901;	// ADC Configuration
-ECReg	ADCCTL			_at_ 0x1902;	// ADC Clock Control
+ECReg	ADCSTS			_at_ 0x1900;	// ADC Status         只在初始化中使用到
+ECReg	ADCCFG			_at_ 0x1901;	// ADC Configuration  只在初始化中使用到
+ECReg	ADCCTL			_at_ 0x1902;	// ADC Clock Control  只在初始化中使用到
 ECReg	VCH0CTL			_at_ 0x1904;	// Voltage Channel 0 Channel Control
 ECReg	KDCTL			_at_ 0x1905;	// Calibration Data Control Register
 ECReg	VCH1CTL      	_at_ 0x1906;	// Voltage Channel 1 Control
@@ -420,9 +420,9 @@ ECReg	VCH2DATM     	_at_ 0x190B;	// Voltage Channel 2 Data Buffer MSB
 ECReg	VCH3CTL       	_at_ 0x190C;	// Voltage Channel 3 Control
 ECReg	VCH3DATL      	_at_ 0x190D;	// Voltage Channel 3 Data Buffer LSB
 ECReg	VCH3DATM      	_at_ 0x190E;	// Voltage Channel 3 Data Buffer MSB
-ECReg	VHSCDBL      	_at_ 0x1914;	// Voltage High Scale Calibration Data Buffer LSB
-ECReg	VHSCDBM       	_at_ 0x1915;	// Voltage High Scale Calibration Data Buffer MSB
-ECReg	VCH0DATL		_at_ 0x1918;	// Voltage Channel 0 Data Buffer LSB
+ECReg	VHSCDBL      	_at_ 0x1914;	// Voltage High Scale Calibration Data Buffer LSB  这个没用到
+ECReg	VHSCDBM       	_at_ 0x1915;	// Voltage High Scale Calibration Data Buffer MSB  这个没用到
+ECReg	VCH0DATL		_at_ 0x1918;	// Voltage Channel 0 Data Buffer LSB                通道0 的数据获取
 ECReg	VCH0DATM		_at_ 0x1919;	// Voltage Channel 0 Data Buffer MSB
 ECReg	VHSGCDBL      	_at_ 0x191C;	// Voltage High Scale Gain-error Calibration Data Buffer LSB
 ECReg	VHSGCDBM     	_at_ 0x191d;	// Voltage High Scale Gain-error Calibration Data Buffer MSB
@@ -444,8 +444,8 @@ ECReg   VCH7DATL        _at_ 0x1943;    // Volt Channel 7 Data Buffer LSB
 // (1Axxh) Digital to Analog Converter (DAC) 
 //-----------------------------------------------------------------------------
 ECReg	DACPWRDN      	_at_ 0x1A01;	// DAC Power Down Register
-ECReg	DACDAT0      	_at_ 0x1A02;	// DAC Data Channel 0
-ECReg	DACDAT1       	_at_ 0x1A03;	// DAC Data Channel 1
+ECReg	DACDAT0      	_at_ 0x1A02;	// DAC Data Channel 0  手册里面没有这两个寄存器
+ECReg	DACDAT1       	_at_ 0x1A03;	// DAC Data Channel 1  手册里面没有这两个寄存器
 ECReg	DACDAT2        	_at_ 0x1A04;	// DAC Data Channel 2
 ECReg	DACDAT3       	_at_ 0x1A05;	// DAC Data Channel 3
 ECReg	DACDAT4       	_at_ 0x1A06;	// DAC Data Channel 4
@@ -538,14 +538,14 @@ ECReg	HOCTL2_A      	_at_ 0x1C10;	// Host Control2 A
 ECReg	HOCTL2_B      	_at_ 0x1C21;	// Host Control2 B
 ECReg	HOCTL2_C      	_at_ 0x1C32;	// Host Control2 C
 ECReg	HOCTL2_D      	_at_ 0x1C3E;	// Host Control2 D
-ECReg	SMB4P7USL   	_at_ 0x1C22;	// 4.7 �gs Low Register
-ECReg	SMB4P0USH   	_at_ 0x1C23;	// 4.7 �gs High Register
+ECReg	SMB4P7USL   	_at_ 0x1C22;	// 4.7 �gs Low Register
+ECReg	SMB4P0USH   	_at_ 0x1C23;	// 4.7 �gs High Register
 ECReg	SMB300NS  		_at_ 0x1C24;	// 300 ns Register
 ECReg	SMB250NS  		_at_ 0x1C25;	// 250 ns Register
 ECReg	SMB25MS   		_at_ 0x1C26;	// 25 ms Register
-ECReg	SMB45P3USL 		_at_ 0x1C27;	// 45.3 �gs Low Register
-ECReg	SMBS4P3USH 		_at_ 0x1C28;	// 45.3 �gs High Register
-ECReg	SMB4P7A4P0H		_at_ 0x1C33;	// 4.7 �gs and 4.0 �gs High Register
+ECReg	SMB45P3USL 		_at_ 0x1C27;	// 45.3 �gs Low Register
+ECReg	SMBS4P3USH 		_at_ 0x1C28;	// 45.3 �gs High Register
+ECReg	SMB4P7A4P0H		_at_ 0x1C33;	// 4.7 �gs and 4.0 �gs High Register
 
 ECReg	SLVISEL			_at_ 0x1C34;	// Slave Interface Select
 ECReg	SCLKTS_A		_at_ 0x1C40;	// SMCLK Timing Setting Register A

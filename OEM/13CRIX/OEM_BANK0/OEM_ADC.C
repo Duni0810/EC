@@ -57,6 +57,8 @@ void EnableADCModule(void)
 	SET_MASK(ADCCFG, ADCEN);
 }
 
+
+// 扫描所有的ADC通道，这里主要用到ADC通道1与ADC通道7
 void ScanAll_ADCChannel(void)
 {
 #if Used_Ch0
@@ -130,13 +132,20 @@ void ScanAll_ADCChannel(void)
 //----------------------------------------------------------------------------
 void Init_ADC(void)
 {
+    // 初始化ADC功能
+    // 1. 将  AINITB @ ADCSTS 执行一次开关，手册有要求这样操作，并且这个位设置为0，如果设置为1会导致大量的能耗
+    // 2. 使能 数据溢出事件和周期结束事件，并选择ADC时钟源 DOVE,EOCE,SDIVSRC @ ADCSTS
+    // 3. 设置ADC转化时间，为52.2ms,并禁能ADC模块  {ADCCTS1, ADCCTS0} = 11B
+    // 4. 使能ADC通道0以及ADC通道7   VCHnCTL(1,7)
+    // 5. 使能ADC 功能   ADCCFG bit0
+
     // Initial ADC registers 手册要求这样  初始化不应该启动EC因为会提高能耗
     SET_MASK(ADCSTS, AINITB);    // Analog Accuracy Initialization start
     CLEAR_MASK(ADCSTS, AINITB);  // Analog Accuracy Initialization stop
 
     SET_MASK(ADCSTS, DOVE);      // Data Overflow Event
     SET_MASK(ADCSTS, EOCE);      // End-of-Cycle Event
-    CLEAR_MASK(ADCSTS, SDIVSRC); // Clock Source Select, EC clock(9.2MHz)
+    CLEAR_MASK(ADCSTS, SDIVSRC); // Clock Source Select, EC clock(9.2MHz) 选择EC时钟源
     
     // ADC Conversion Time set
     //
@@ -169,6 +178,7 @@ void Init_ADC(void)
 
 #if 1
 
+// NTC 热敏电阻曲线
 const unsigned char code NTC110K[]=
 {
 //0   1        2        3        4        5        6        7       8        9        A       B        C        D       E      F
@@ -187,6 +197,10 @@ const unsigned char code NTC110K[]=
 9,   9,   9,   8,   8,   8,   7,   7,   7,   6,   6,   6,   5,   5,   5,  4,
 4,   4,   3,   3,   3,   2,   2,   2,   1,   1,   1,   0,   0,   0,   0,  0,
 };
+
+
+
+// 以下都是为了通过热敏电阻的变化值，获取温度参数
 void Get_Thermistor0_data(void)
 {
 	BYTE index;
@@ -199,7 +213,7 @@ void Get_Thermistor0_data(void)
 
 	ADC0_NTC_T = NTC110K[index];
 
-	if(ADC0_NTC_T>13) // Dennis required to correction error
+	if(ADC0_NTC_T>13) // Dennis required to correction error  这个是错误码，相当于偏移量了吧
 	{
 		ADC0_NTC_T = ADC0_NTC_T-13;
 	}
@@ -209,6 +223,7 @@ void Get_Thermistor0_data(void)
 	}
 }
 
+// 这个通道好像没有被使能
 void Get_Thermistor1_data(void)
 {
 	BYTE index;

@@ -143,7 +143,7 @@ void main_service(void)
     {
         //-----------------------------------
         // Host command/data service    6064 
-        // 通过KBC接口处理来自系统的命令/数据
+        // 处理通过KBC接口接受来自系统的命令或者数据
         // 表示有6064 服务数据需要发送
         //-----------------------------------
         if(F_Service_PCI)
@@ -164,7 +164,8 @@ void main_service(void)
         }
 
         //-----------------------------------
-        // Send byte from KBC       6064
+        // Send byte from KBC       6064 
+        // KBC数据发送通
         //-----------------------------------
         if(F_Service_SEND)
         {
@@ -174,7 +175,7 @@ void main_service(void)
         }
 
         //-----------------------------------
-        // Send PS2 interface data	
+        // Send PS2 interface data	发送数据过程
         //-----------------------------------
         if(F_Service_Send_PS2)
         {
@@ -184,7 +185,7 @@ void main_service(void)
         }
 
         //-----------------------------------
-        // process PS2 interface data
+        // process PS2 interface data  处理数据过程
         // 这个PS2 好像是 鼠标的服务函数
         //-----------------------------------
         if(F_Service_PS2)
@@ -370,16 +371,20 @@ void service_1mS(void)
 {
 	Timer1msEvent();
 	Timer1msCnt++;
+
+    // 10ms 后清空这个flag
     if(Timer1msCnt>=10)
     {
         Timer1msCnt = 0x00;
     }
 
+    // 判断是否是关机事件 ， 如果是关机事件 1ms 事件为空，不执行
     if(Hook_Only_Timer1msEvent()==Only_Timer1msEvent)
     {   
         return;
     }
 
+    // 5ms事件
     if((Timer1msCnt%5)==0x00)
     {
 	    Timer5msEvent();
@@ -414,8 +419,9 @@ void service_1mS(void)
 				    Timer5msCnt=0;
               	    break;
      	    }
-
-    	    if ( Timer5msCnt == 0x00 )  // default 事件
+             
+            // default 事件
+    	    if ( Timer5msCnt == 0x00 )  
     	    {       			// 50msec
           	    Timer100msCnt ++;
           	    if ( Timer100msCnt & 1 )

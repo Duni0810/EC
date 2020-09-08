@@ -514,7 +514,7 @@ void MoniterTemprature(void)
 		//PCH_PROCHOT_OFF();
 	}
 		
-
+	// CPU温度过高 关机
 	if(TCPU_temp >= ShutdownTM)    //EC shutdown
 	{
 		CPU_TooHot_Cnt += 1;

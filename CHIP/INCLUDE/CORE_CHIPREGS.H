@@ -487,7 +487,7 @@ extern ECReg    VCH7DATL        ;// 0x1943 Volt Channel 7 Data Buffer LSB
 // (19xxh) Analog to Digital converter (ADC) 
 //-----------------------------------------------------------------------------
 // ADC Status Register
-#define	FIRHIACC			BIT(7)	// Filter High Accuracy
+#define	FIRHIACC			BIT(7)	// Filter High Accuracy 代码中定义的是ADCCTS1
 #define	SDIVSRC			    BIT(5)  // Clock Source Select
 #define AINITB				BIT(3)	// Analog Accuracy Initialization Bit
 #define	ADCPS				BIT(2)	// ADC Power Statement
@@ -495,7 +495,7 @@ extern ECReg    VCH7DATL        ;// 0x1943 Volt Channel 7 Data Buffer LSB
 #define	EOCE				BIT(0)	// End-of-Cycle Event
 
 // ADC Configuration Register
-#define	DFILEN				BIT(5)	// Digital Filter Enable
+#define	DFILEN				BIT(5)	// Digital Filter Enable  代码中定义的是 ADCCTS0
 #define	INTECEN				BIT(2)	// Interrupt from End-of-Cycle Event Enable
 #define	ADCEN				BIT(0)	// ADC Module Enable
 
@@ -1054,8 +1054,8 @@ extern ECReg	TMEIE			;// 0x290C  TMR Interrupt Enable Register
 // (13xxh) Keyboard Controller (KBC) 
 //-----------------------------------------------------------------------------
 // KBC Host Interface Control Register
-#define	PM1ICIE				BIT(6)	// PM Channel 1 Input Buffer Full 8032 Interrupt Enable
-#define	PM1OCIE				BIT(5)	// PM Channel 1 Output Buffer Empty 8032 Interrupt Enable
+#define	PM1ICIE				BIT(6)	// PM Channel 1 Input Buffer Full 8032 Interrupt Enable   手册中并没有描述这两个字段
+#define	PM1OCIE				BIT(5)	// PM Channel 1 Output Buffer Empty 8032 Interrupt Enable 手册中并没有描述这两个字段
 #define	PM1HIE				BIT(4)	// PM Channel 1 Host Interface Interrupt Enable
 #define	IBFCIE				BIT(3)	// Input Buffer Full 8032 Interrupt Enable
 #define OBECIE				BIT(2)	// Output Buffer Empty 8032 Interrupt Enable
@@ -1167,7 +1167,7 @@ extern ECReg	TMEIE			;// 0x290C  TMR Interrupt Enable Register
 // (19xxh) Analog to Digital converter (ADC) 
 //-----------------------------------------------------------------------------
 // ADC Status Register
-#define	FIRHIACC			BIT(7)	// Filter High Accuracy
+#define	FIRHIACC			BIT(7)	// Filter High Accuracy 
 #define AINITB				BIT(3)	// Analog Accuracy Initialization Bit
 #define	ADCPS				BIT(2)	// ADC Power Statement
 #define	DOVE				BIT(1)	// Data Overflow Event

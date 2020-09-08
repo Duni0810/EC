@@ -163,8 +163,14 @@ const sREG_INIT_DEF code reg_init_table[] =
         { &KSOCTRL   	,KSOOD + KSOPU      },	//
   		{ &KSICTRL   	,KSIPU       		},	//
 	
-// ADC								
-  		{ &ADCSTS    	,AINITB             }, 	// Enable Analog accuracy initialization
+// ADC		
+        // 初始化默认ADC 默认寄存器：
+        // 1. 先将 AINITB @ADCSTS 设置为1 并之后设置为0， 仅仅在上电后执行一次，并将ADCCTS1设置为 1
+  		// 2. 将ADC配置全部清空  ADCCFG 配置为 0
+        // 3. 自动硬件校准启用 AHCE @ KDCTL 配置为 1
+        // 4. 将 ADCCTS0 @ ADCCFG 配置为 1，与第一点配合，及 {ADCCTS1, ADCCTS0} = 11b ,Conversion Time = 200*251 us = 52ms
+        // 5. 默认配置 选择时钟分频因子 为 0x15 ，实际上启用默认配置时候后，使用0xFA
+        { &ADCSTS    	,AINITB             }, 	// Enable Analog accuracy initialization
         //{ &ADCSTS    	,0                 	}, 	// Stop adc accuracy initialization
         { &ADCSTS    	,0x80          		}, 	// Stop adc accuracy initialization
 		{ &ADCCFG    	,0         			}, 	//
