@@ -31,8 +31,10 @@ struct Sscan
     FIELD kbf_head:  4; /* Keyboard buffer head (0-15). */
     FIELD kbf_tail:  4; /* Keyboard buffer tail (0-15). */
     FIELD kbf_mark:  4; /* Keyboard buffer overflow marker (0-15). */
+
     FIELD TMscale:   4; /* Typematic scale. */
     FIELD scan_line: 4;
+    
     FIELD saf_make:  1; /* Scan activity flag - make.        */
     FIELD saf_break: 1; /* Scan activity flag - break.       */
     FIELD saf_keys:  1; /* Scan activity flag - keys active. */

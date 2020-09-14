@@ -60,7 +60,7 @@ void Send_Scan2(union KEY key, BYTE event)
         // 这里可能有键盘的映射关系
 		ITempB03 = *(Scanner_Table_Pntr + ITempB04);    //matrix code To Scan Code Set 2
 
-        // 睡眠唤醒
+        // 如果系统处于睡眠模式，则按键唤醒
 		Hook_keyboard(key.field.input, key.field.output); // wake up System from S3
 		
     	Send_Key(ITempB03, event);

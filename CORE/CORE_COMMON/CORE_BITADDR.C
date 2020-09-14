@@ -13,7 +13,6 @@
 // Command Byte不能直接通过60h和64端口读取，若要访问它，
 //必须首先通过64h端口向8042发布相应命令（20h/read,60h/write），然后再通过60h存取
 // commnand byte
-// 状态寄存器
 volatile unsigned char bdata Ccb42 _at_ 0x20;
 sbit Ccb42_INTR_KEY  = Ccb42^0;  // enable 键盘中断
 sbit Ccb42_INTR_AUX  = Ccb42^1;  // enable 鼠标中断

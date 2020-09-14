@@ -12,6 +12,7 @@
 #include <CORE_INCLUDE.H>
 #include <OEM_INCLUDE.H>
 
+// 延时一个时钟周期
 void CapDelay(void)
 {
     WNCKR = 0x00;               // Delay 15.26 us. page 411, 使用65.536KHz 频率
@@ -25,6 +26,8 @@ void CapDelay(void)
  *
  * Return: value != 0, scan activity detected, scan again later. 检测到扫描活动，稍后再扫描。
  *         value  = 0, no scan activity detected. 未检测到扫描活动。
+ * 
+ * // 若返回 非0 表示有按键动作(make, break or repeat)
  * ------------------------------------------------------------------------- */
 BYTE scan_keys(void)
 {
@@ -32,19 +35,21 @@ BYTE scan_keys(void)
 	result = FALSE;
 	//TF_006++>>
     /* key buffer half-full or not */
-    // 实际上就是一个环形缓冲区
-    // 如果buffer 超过一半的话 返回0x01   否则为0x00
+    // 这个buffer实际上就是一个环形缓冲区
+    // 如果buffer 超过一半的话 返回0x01  并且超过一半的buffer 就不进行扫描操作
     if(check_keyscan_buffer_half_full() != 0x00)
     {
         return(0x01);  // 
     }
+
     //TF_006++<<
     // 先清空按键状态
-    scan.saf_make  = 0;  // 通码？
-    scan.saf_break = 0;  // 断码？
+    scan.saf_make  = 0;  // 通码
+    scan.saf_break = 0;  // 断码
     scan.saf_keys  = 0;  // 按键有效
 
     // 感觉像做检测按键按下的状态类型  表示是什么按键按下和通码断码的状态
+    // 键盘上有动作时，typematic.byte 不为0 ,实际上 这个值在 change_valid()函数中被改变
  	if (typematic.byte)
 	{
      	check_tm(typematic);  	// Check typematic.
@@ -53,20 +58,26 @@ BYTE scan_keys(void)
 	if (new_keyh.byte)   		// Exist Debounce key?  Debounce：防反跳
  	{   						// Yes, bounding. 
      	scan.saf_make = 1;   	// Set debounce make bit.  通码标志
-      	debounce_key();
+      	debounce_key();         // 这个函数里面有 change_valid 他会改变数值 typematic
       	result = TRUE;
  	}
     
+    // result = false 进入函数
     if (!result)				// Otherwise, scan all. 
     {
         for (ITempB03=0;ITempB03<16;ITempB03++)
         {
+            // 将相应的位置1
         	Write_Strobe(ITempB03);
 			CapDelay();         // 这里是延时一个时间周期
+
+            // 这个是读取感应线状态，默认KSI位高电平，如果有按键按下，则相应的感应线为低电平
          	ITempB02 = KSI; 	// Read in KI 0 - 7 sense line data.  default is High
 			//-----------------------------------
 			//Label:BLD_TIPIA_20160827_005
-			if(0x0F==ITempB03)
+
+            // 理论上永远运行不到这里，并且也不明白为什么要 “| 0x02”
+			if(0x0F==ITempB03)  // 当扫描到第16行(从第0行开始)我猜测这个是预留给外部拓展键盘的代码
 			{
 				/*
 				if(Read_Delete())
@@ -82,6 +93,8 @@ BYTE scan_keys(void)
 			//-----------------------------------
 
 			ITempB02 = (~ITempB02) ^ bscan_matrix[ITempB03];
+            
+            // 检测到有按键按下
             if (ITempB02 != 0)
            	{
             	check_scan(ITempB02, ITempB03); 
@@ -93,7 +106,8 @@ BYTE scan_keys(void)
             }   
 			KSOL=0xFF;	
 			KSOH1=0xFF;
-        }
+        } // 扫描16行结束
+
         								// If ghost exist, make key clear.
         if (new_keyl.field.ghost == 1)
         {  
@@ -131,20 +145,41 @@ BYTE scan_keys(void)
  * used for something else.
  *
  * Input: Scan line number.
+ * 
+ * 
+ * 功能：Write_Strobe
+ * 根据“扫描线”位元数写入扫描矩阵KSO [15：0]行。
+ * 
+ * KSO [15：0]将全部浮动或断开，除了与扫描行号相对应的位。 该位将为低，以便稍后由感测线输入端口检测到。
+ * 
+ * Config.Msk_Strobe_H和Config.Msk_Strobe_L指定端口的16位中的哪一个用于扫描程序。 （1 =扫描仪，0 =其
+ * 他OEM功能）。 这样可以将不用于扫描仪输出线的端口引脚用于其他用途。
+ * 输入：扫描行号。
+ * 
+ * 
+ * 其实相当于低电平扫描有效行
+
  * ------------------------------------------------------------------------- */
 void Write_Strobe(BYTE scan_line_num) //default is High, Low effective
 {
+    // 这个有循环16字节，其中分为高8位和低8位
+    // 如果是低8位，则先将高8位设置为高电平，其余的循环扫描到低8位的某一位，则某个位置设置为0
+    // 例如循环到 第三行，则 设置为 1111 1111 1111 0111
 	if (scan_line_num<8)
-   	{
+   	{   
+
      	KSOL=~(0x01<<scan_line_num);
       	KSOH1=0xFF;
-  	}
- 	else
-  	{
+  	} else {
+
+    // 当扫描到高8位时，即设置低8位为1，其余的循环扫描到高8位的某一位，则某个位置设置为0
+    // 下面代码中 -0x08是因为寄存器分为高8位和低8位，所以设置设置高8位必须减去偏移量，然后写入寄存我
+    // 例如循环到 第12行，则 设置为 11110 1111 1111 1111
      	KSOL=0xFF;
    		KSOH1=~(0x01<<(scan_line_num-0x08));
    	} 
 
+    // 判断有误外部键盘
 	if(ExtendMatrix)
 	{
 		KSOH2 = 0xFF;
@@ -506,18 +541,24 @@ static void check_tm(union KEY key)
     // 好像采用的行扫描的方式
     // Byte_Mask((BYTE) (key.field.input));   这句好像是在表明某一行存在按键按下
  	ITempB02 = FALSE;
-    ITempB01 = Byte_Mask((BYTE) (key.field.input)); 
+    ITempB01 = Byte_Mask((BYTE) (key.field.input));  // 3字节 
+
+    // 判断有没有按键按下，其实是按键是否有效
     ITempB01 = ITempB01 & bscan_matrix[key.field.output]; // bscan_matrix 为19字节的数组
 
-    // 好像是没有按键按下
-    // 如此的话下面的函数就不进入了
+
+    // 如此的话下面的函数就不进入了，没有按键按下
     if (ITempB01 == 0)		 	// Release Typematic key?  
     {   
         typematic.byte = 0;	    // Clear Typematic. 
         ITempB02 = TRUE;        // #define TRUE 1
     }
 
-    
+    // 如果按键是make code 的话 ,就是说明有新的按键下面这个数值会重新赋值，否则不会赋值
+    // scan.TMscale = TM_SCALE;
+    // bTMcount = bTMdelay;
+    // 如果执行上一个if 判断 ，就不会执行下面操作
+    // 说明有按键按下，并且有效
     if (!ITempB02)
     {  
         scan.TMscale--;		    // Count down Prescale.
@@ -527,7 +568,7 @@ static void check_tm(union KEY key)
         }
     }
 
-    
+    // 如果执行上一个if 判断 ，就不会执行下面操作，说明有按键按下
     if (!ITempB02)
     {
         scan.TMscale = TM_SCALE;// Reload prescale counter. 
@@ -538,7 +579,7 @@ static void check_tm(union KEY key)
         }
     }
 
-    
+    // 如果执行上一个if 判断 ，就不会执行下面操作，说明有按键按下
     if (!ITempB02)
     {
         bTMcount = bTMrepeat;   // Reload TMcount.  bTMrepeat 为20
@@ -1321,6 +1362,7 @@ void CheckEtKeystm(union KEY key)
  *
  * ****************************************************************************
  */
+// 如果键盘buffer中的数据超过一半，则返回1， 否则返回0
 BYTE check_keyscan_buffer_half_full(void)
 {
     BYTE lb_pending_size;

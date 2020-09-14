@@ -58,7 +58,7 @@ void EnableADCModule(void)
 }
 
 
-// 扫描所有的ADC通道，这里主要用到ADC通道1与ADC通道7
+// 扫描所有的ADC通道，这里主要用到ADC通道0与ADC通道7
 void ScanAll_ADCChannel(void)
 {
 #if Used_Ch0

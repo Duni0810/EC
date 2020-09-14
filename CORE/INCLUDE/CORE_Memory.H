@@ -106,7 +106,7 @@ extern	IBYTE	ITempB04;          // 都只作为临时变量使用而已
 extern	IBYTE	ITempB05;          // 都只作为临时变量使用而已
 extern	IBYTE	ITempB06;          // 都只作为临时变量使用而已
 extern	IWORD	ITempW01;          // 都只作为临时变量使用而已
-extern 	IBYTE 	bscan_matrix[];
+extern 	IBYTE 	bscan_matrix[]; // 感觉像一个buffer
 
 /*****************************************************************************/
 /* INTERNAL INDIRECT RAM AREA     (0x80 ~ 0xFF) ******************************/
