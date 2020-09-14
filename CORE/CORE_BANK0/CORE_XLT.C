@@ -461,7 +461,7 @@ static void cursor_shift(BYTE scan_code, BYTE event)
         { 									/* Right shift has been pressed. */
             Buffer_String(csr_sftr_brk2);   /* Buffer tail-string. */
         }
-    }
+    }   
     else if (event == MAKE_EVENT)
     {   /* Key is pressed for the first time, a "make event". */
         									/* Left and/or Right SHIFT is pressed. */
