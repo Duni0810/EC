@@ -886,6 +886,10 @@ const A2_TABLE sskey2_A2_table[] =
 /* ----------------------------------------------------------------------------
  * FUNCTION: sskey2_overlay_table
  * ------------------------------------------------------------------------- */
+// 第一个字节为 功能索引号，功能在 sskey3_80_table 中定义
+// 实际上这个操作已经将键盘的F1 ~ F12 转化为标准的键码2的值，其中第1列就是标准键码值
+// 例如 在标准键码表中对应的 F9 为01，在该键盘中对应的功能是 音量+,他的功能索引码为A1
+// 在 sskey3_80_table 中注释中能找到相应位置
 const BYTE code  sskey2_overlay_table[] =
 {
 //index 	            Normal	        Fn
@@ -1177,6 +1181,7 @@ void Et_CheckKBS3Wake(BYTE BKSI,BYTE BKSO)
 //----------------------------------------------------------------------------
 void OEM_Hook_Send_Key(BYTE table_entry, BYTE event)
 {
+	// 只要系统不为 正常工作状态，就执行if函数
     if(SystemNotS0)  // 系统不为S0状态
     {  	
         CheckBootHotKey(table_entry,event);

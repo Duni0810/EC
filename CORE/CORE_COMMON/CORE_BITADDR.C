@@ -95,14 +95,14 @@ sbit Led_Data_LED6   = Led_Data^6;
 sbit Led_Data_LED7   = Led_Data^7;
 
 volatile unsigned char bdata Scanner_State _at_ 0x29;
-sbit Scanner_State_NUM_LOCK  = Scanner_State^0;
-sbit Scanner_State_LEFT      = Scanner_State^1;
+sbit Scanner_State_NUM_LOCK  = Scanner_State^0;  // 数字键盘锁定
+sbit Scanner_State_LEFT      = Scanner_State^1;  // 
 sbit Scanner_State_RIGHT     = Scanner_State^2;
-sbit Scanner_State_ALT       = Scanner_State^3;
-sbit Scanner_State_CONTROL   = Scanner_State^4;
-sbit Scanner_State_OVERLAY   = Scanner_State^5;
-sbit Scanner_State_FN        = Scanner_State^6;
-sbit Scanner_State_FN_SILENT = Scanner_State^7;
+sbit Scanner_State_ALT       = Scanner_State^3;  // ALT 按键
+sbit Scanner_State_CONTROL   = Scanner_State^4;  // control按键按下
+sbit Scanner_State_OVERLAY   = Scanner_State^5;  // 覆盖键盘,相当于重定义按键功能
+sbit Scanner_State_FN        = Scanner_State^6;  // 功能按键
+sbit Scanner_State_FN_SILENT = Scanner_State^7;  // 禁用 FN???
 
 volatile unsigned char bdata Gen_Info _at_ 0x2A;
 sbit Gen_Info_LED_CHANGE  = Gen_Info^0;

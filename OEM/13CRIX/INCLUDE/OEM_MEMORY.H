@@ -106,6 +106,8 @@ extern XBYTE S3_state;	//J80_004++
 extern XBYTE S3_auto_L;
 extern XBYTE S3_auto_H;
 //J80_016++<<
+
+// 不知道干嘛的？？？
 extern XBYTE   Fn_S_V_Flag;
 #define  _FN_BIT   BIT0
 #define  _S_BIT    BIT1

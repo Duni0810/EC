@@ -50,11 +50,13 @@ BYTE scan_keys(void)
 
     // 感觉像做检测按键按下的状态类型  表示是什么按键按下和通码断码的状态
     // 键盘上有动作时，typematic.byte 不为0 ,实际上 这个值在 change_valid()函数中被改变
+    // change_valid 这个函数在debounce_key 中
  	if (typematic.byte)
 	{
      	check_tm(typematic);  	// Check typematic.
  	}
 
+    // 表示有新的按键按下
 	if (new_keyh.byte)   		// Exist Debounce key?  Debounce：防反跳
  	{   						// Yes, bounding. 
      	scan.saf_make = 1;   	// Set debounce make bit.  通码标志
@@ -544,19 +546,19 @@ static void check_tm(union KEY key)
     ITempB01 = Byte_Mask((BYTE) (key.field.input));  // 3字节 
 
     // 判断有没有按键按下，其实是按键是否有效
+    // bscan_matrix[key.field.output] 极有可能的是保留上一个列状态
+    // ITempB01 保持的是当前的列状态，如果进行&操作表示的是状态标志
     ITempB01 = ITempB01 & bscan_matrix[key.field.output]; // bscan_matrix 为19字节的数组
 
 
-    // 如此的话下面的函数就不进入了，没有按键按下
+    // 如此的话下面的函数就不进入了，没有按键按下，并清除当前按键类型
     if (ITempB01 == 0)		 	// Release Typematic key?  
     {   
         typematic.byte = 0;	    // Clear Typematic. 
         ITempB02 = TRUE;        // #define TRUE 1
     }
 
-    // 如果按键是make code 的话 ,就是说明有新的按键下面这个数值会重新赋值，否则不会赋值
-    // scan.TMscale = TM_SCALE;
-    // bTMcount = bTMdelay;
+    // 如果按键是make code 的话 ,就是说明有新的按键。下面这个数值会重新赋值，否则不会赋值
     // 如果执行上一个if 判断 ，就不会执行下面操作
     // 说明有按键按下，并且有效
     if (!ITempB02)
@@ -580,6 +582,7 @@ static void check_tm(union KEY key)
     }
 
     // 如果执行上一个if 判断 ，就不会执行下面操作，说明有按键按下
+    // 说明按键与上一个按键是同一个，所以是repeat 模式
     if (!ITempB02)
     {
         bTMcount = bTMrepeat;   // Reload TMcount.  bTMrepeat 为20
