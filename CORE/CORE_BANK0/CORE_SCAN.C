@@ -53,6 +53,8 @@ BYTE scan_keys(void)
     // change_valid 这个函数在debounce_key 中
  	if (typematic.byte)
 	{
+        // 如果在这个函数中判断的是repeat code，则将repeat 数据重新发送即可
+        // 否则什么都不做
      	check_tm(typematic);  	// Check typematic.
  	}
 
@@ -65,11 +67,13 @@ BYTE scan_keys(void)
  	}
     
     // result = false 进入函数
+    // 如果是第一次按下按键也会进这里
     if (!result)				// Otherwise, scan all. 
     {
+        // 十六列的扫描
         for (ITempB03=0;ITempB03<16;ITempB03++)
         {
-            // 将相应的位置1
+            // 将相应的位置1，其实就是设置矩阵扫描的电平信号(KSO)；传入的数据为每列的编码号
         	Write_Strobe(ITempB03);
 			CapDelay();         // 这里是延时一个时间周期
 
@@ -78,7 +82,7 @@ BYTE scan_keys(void)
 			//-----------------------------------
 			//Label:BLD_TIPIA_20160827_005
 
-            // 理论上永远运行不到这里，并且也不明白为什么要 “| 0x02”
+            // 扫描到最后一列，并且也不明白为什么要 “| 0x02”
 			if(0x0F==ITempB03)  // 当扫描到第16行(从第0行开始)我猜测这个是预留给外部拓展键盘的代码
 			{
 				/*
@@ -93,24 +97,31 @@ BYTE scan_keys(void)
 				//}
 			}
 			//-----------------------------------
-
+            
+            // 这里 ITempB02 表示的是 KSI sense line 的状态
+            // 并且默认KSI为高电平，如果有按键按下，则相应的感应线为低电平
+            // ~ITempB02 表示 有按键按下的感应线变为高电平
 			ITempB02 = (~ITempB02) ^ bscan_matrix[ITempB03];
             
-            // 检测到有按键按下
+            // 检测到有新的按键按下
             if (ITempB02 != 0)
            	{
+                // 传入的是 感应线状态，和当前扫描的列数
             	check_scan(ITempB02, ITempB03); 
           	}
 
+            // 判断上一个按键是否仍然有效
             if (bscan_matrix[ITempB03]) 
           	{  							// Here, if current still active. 
                 scan.saf_keys = 1;   	// Set keys active bits. Check all key release. 
             }   
+
+            // 清空矩阵键盘状态
 			KSOL=0xFF;	
 			KSOH1=0xFF;
         } // 扫描16行结束
 
-        								// If ghost exist, make key clear.
+        // If ghost exist, make key clear.
         if (new_keyl.field.ghost == 1)
         {  
             new_keyl.field.ghost = 0;	// Ghost flag is set. Clear it.
@@ -203,6 +214,7 @@ void Write_Strobe(BYTE scan_line_num) //default is High, Low effective
  * zeros.  Right shifting a signed quantity will fill vacated bits with sign
  * bits on some machines and zero bits on others.)
  * ------------------------------------------------------------------------- */
+// 这里传入 change 为 sense line 状态， scan_address 为 扫描的列地址
 static void check_scan(BYTE changes, BYTE scan_address)
 {
     BYTE flag;
@@ -210,33 +222,44 @@ static void check_scan(BYTE changes, BYTE scan_address)
     BYTE bit_num; 
      
 	flag = FALSE;					// Simple Matrix. 
+
+
 	if (new_keyl.field.ghost == 1)
  	{
     	flag = TRUE;
 	}
 	else
 	{   /* Find 0 -> 1 's. */
+        // 其实这里是为了找到改变之前的make key 的键码
+        // 例如我之前sense line 状态为 0x01, 现在的状态为0x04
+        // 所以在之前进行 ITempB02 = (~ITempB02) ^ bscan_matrix[ITempB03] 操作是找到所以改变的按键
+        // 这里的与操作是为了反找到改变的按键，就是0x40
 		change_make_key = changes & ~bscan_matrix[scan_address];
+
+        // 改变的键值为 空
      	if (change_make_key == 0) 
 		{
            	flag = FALSE;
     	}
-   		else if (find_paths(change_make_key, scan_address)) 
+   		else if (find_paths(change_make_key, scan_address))   // 判断鬼键是否存在
 		{
          	flag = TRUE;    /* TRUE if ghost keys. */
        	}
 	}
 
+    // 这个函数就是判断鬼键存在，并设置鬼键的flag
 	if (flag)
  	{   /* Ghost exists. */
   		new_keyl.field.ghost = 1;  /* Set ghost flag. */
     	/* Only look at 1 -> 0 transition & diode key always no ghost. */
+        // 消除鬼键，这个办法就是去除引发鬼键的按键
      	changes &= bscan_matrix[scan_address] | diode_key;
 	}
 
     bit_num = 0;
     while (changes != 0)
-    {   
+    {  
+        // 当前sense line 有按键按下 
         if (changes & 0x01) 	/* Look at changes 1 bit at a time. */
 		{
             cscfnd(bit_num, scan_address);
@@ -252,8 +275,10 @@ static void check_scan(BYTE changes, BYTE scan_address)
  * Find changed bit.  This subroutine is called for each bit in this KSI that
  * is different from last KSI.
  * ------------------------------------------------------------------------- */
+// 查找更改的位。 对于此KSI中与上一个KSI不同的每个位
 static void cscfnd(BYTE bit_num, BYTE scan_address)
 {
+    // Byte_Mask(bit_num) = (1 << (bit_num))
     if (bscan_matrix[scan_address] & Byte_Mask(bit_num))
     {  
         if (scan.saf_break == 0) 
@@ -308,6 +333,8 @@ static void setup_debounce(BYTE bit_num, BYTE scan_address, BYTE event)
  *
  * Return: FALSE if no paths found, Otherwise returns TRUE.
  * ------------------------------------------------------------------------- */
+// change_make_key 是 新的按键位置， scan_address 这个是扫描的地址(0-15)
+// 我觉得这个像是在判断鬼键，返回时true表示为鬼键，false 为不是鬼键
 static FLAG find_paths(BYTE change_make_key, BYTE scan_address)
 {
     FLAG paths_found, done;
@@ -318,20 +345,26 @@ static FLAG find_paths(BYTE change_make_key, BYTE scan_address)
        shifting an unsigned quantity fills vacated bits with zeros.  Right
        shifting a signed quantity will fill vacated bits with sign bits on some
        machines and zero bits on others.) */
+    // 初始化 局部变量
     done = FALSE;
     paths_found = FALSE;
-    first_address = scan_address;
+    first_address = scan_address;  //  保存 线状态
 
+    // 因为diode_key 一直为0，所以 对他取反就全为1
+    // 下面这个语句还是 change_make_key 本身
     change_make_key &= ~(diode_key); /* Ignore diode key. */
-    /* change_make_key = bKO_BITS. */
 
+    /* change_make_key = bKO_BITS. */
+    // 空 ，表示下面函数直接不执行，返回为 paths_found = FALSE
     if (change_make_key == 0) 
 	{
         done = TRUE; /* paths_found == FALSE */
     }
 
+    // 可能有数据
     if (!done)
     {
+        // paths 表示的是混合地址
         paths = bscan_matrix[scan_address] | change_make_key;
         paths &= ~(diode_key);  /* Ignore diode key. */
         /* paths = bKO_PATHS. */
@@ -341,10 +374,14 @@ static FLAG find_paths(BYTE change_make_key, BYTE scan_address)
         }
     }
 
+    // 表示 paths 不为空，当然 一般不会是空的，因为只要diode_key 不为FF 就不会是空
     while (!done)
     {
+        // 扫描非当前列数据，因为判断的是鬼键，所以只要保证在一行上有两个或两个以上按键按下，
+        // 如果第三列与这些按键的行列有关，则表示
         scan_address++;
 
+        // 到这里都只是为了循环一遍扫描线，扫描一圈之后跳出循环
         if (scan_address >= MAX_SCAN_LINES) 	
         //if(scan_address >= STANDARD_SCAN_LINES)
 		{
@@ -355,21 +392,32 @@ static FLAG find_paths(BYTE change_make_key, BYTE scan_address)
 		{
             done = TRUE;        /* No scan lines left.  paths_found == FALSE */
         }
+        ///////////////////////////////////////////
 
+
+        // 如果没找到位置的话
         if (!done)
         {   /* Check Path */
             temp  = bscan_matrix[scan_address]; /* Any paths? */
             temp &= ~(diode_key);               /* Ignore diode key */
 
+            
             if (temp != 0) 
 			{    /* Paths found */
+                // 感觉像是获取前一个值，这里的paths 是 混合值，例如前一个值为0x01 当前为0x04, 
+                // 这里的paths 就是0x5 ，这里计算出的temp是其他列与扫描列的比较
                 temp &= paths;  /* Do paths line up? */
             }
 
+            // 其他列与扫描列的比较有交集表示处于同一行上，则进入判断
             if (temp != 0)
             {   /* Paths line up */
+                // 由于temp表示的是正在循环的扫描列与混合地址状态的不同
+                // 如果 正在循环的扫描列的sense line 状态与 按下按键的sense状态一致
+                // 则表示的是有 在在同一行完全相同按键，这个不是鬼键,否则就是存在鬼键
                 if (change_make_key != temp)  /* Only 1 bit set? */
                 {   /* No, ghost exists. */
+                    // 如果进来就说明这个大循环也结束了
                     paths_found = TRUE;
                     done = TRUE;
                 }
@@ -383,6 +431,10 @@ static FLAG find_paths(BYTE change_make_key, BYTE scan_address)
                     bits = paths;  /* Only 1 bit set? */
                     temp = FALSE;
 
+                    // 这里是按位找到鬼键的位置
+                    // 这个do-while 表示的是表示在这列中找到一个按键了
+                    // 并且在后面的if判断中，看下还有没有按键按下，如果有的话表示两个按键按下在同一列
+                    // 这个时候就说明是鬼键
                     do
                     {
                         if (bits & 0x01) 
@@ -502,6 +554,7 @@ static void debounce_key(void)
  *
  * C prototype: BYTE Read_Scan_Lines();
  * ---------------------------------------------------------------- */
+// 读取矩阵键盘感应线函数
 BYTE Read_Scan_Lines(void)
 {
   	return (KSI);                  
@@ -593,6 +646,7 @@ static void check_tm(union KEY key)
 /* ----------------------------------------------------------------
  * FUNCTION: Scan_Init - Initialize internal keyboard (scanner)
  * ---------------------------------------------------------------- */
+// 就是将所有的矩阵输入线设置为低电平
 void Scan_Init(void)				// Lower all KSO lines for scan matrix
 {
  	KSOL  = 0x00;  

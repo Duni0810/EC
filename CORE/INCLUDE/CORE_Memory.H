@@ -252,7 +252,7 @@ extern  XBYTE   DebugTest;      //_at_ 0x1F
 extern 	XBYTE 	bTMrepeat;
 extern 	XBYTE 	bTMdelay;
 extern 	XBYTE 	bTMcount;
-extern 	XBYTE 	diode_key;
+extern 	XBYTE 	diode_key;  // 一直为0
 extern 	BYTE code *Scanner_Table_Pntr;
 extern 	BYTE code *Extendkey_Table_Pntr;
 

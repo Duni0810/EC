@@ -923,6 +923,7 @@ const BYTE code  sskey2_overlay_table[] =
 };
 				// Reserved0xFA~ 0xFF		
 
+// 这个好像没有被使用
 const BYTE code  sskey2_overlay_table1[] =
 {
 //index 	           	 Fn	      		Normal

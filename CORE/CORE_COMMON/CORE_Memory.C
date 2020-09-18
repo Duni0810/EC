@@ -164,7 +164,7 @@ XBYTE   DebugTest                           _at_ 0x1F;
 XBYTE 	bTMrepeat							_at_ 0x23;
 XBYTE 	bTMdelay							_at_ 0x24;
 XBYTE 	bTMcount							_at_ 0x25;
-XBYTE 	diode_key							_at_ 0x26;
+XBYTE 	diode_key							_at_ 0x26; // diode_key 一直是0
 BYTE code *Scanner_Table_Pntr 				_at_ 0x27;
 BYTE code *Extendkey_Table_Pntr 			_at_ 0x29;	
                                         //Reserved 0x2B ~ 0x40

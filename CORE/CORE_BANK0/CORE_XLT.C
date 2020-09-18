@@ -113,8 +113,11 @@ void Send_Key(BYTE table_entry, BYTE event)
         }
         table_entry = sskey2_overlay_table[temp];	// Get a sskey2 value. 
         */
-        
+        // 实际上 table_entry 为键盘键码，例如 F1 为0xE0，这里减去一个基准值就剩下偏移量
+        // 这个偏移量是索引数组使用
         temp = (table_entry - SSKEY2_OVL_CODE);
+
+        // 因为索引表有两列，这里应该索引的是第一列 
         temp = temp << 1;// Multiply 2 because each entry takes 2 bytes 
 
         #if KB_FnStickKey
@@ -162,7 +165,9 @@ void Send_Key(BYTE table_entry, BYTE event)
 		else
 		//TF_012++<<
             // 这个操作实际上已经将键盘上的键码值转化为特殊功能的键码值转化为标准键码2的键码值
-            // 返回的是标准键码2的键值
+            // 举个例子，如果只是单纯按下的是F1 键，则返回的直接是 F1 的标准键值表
+            // 如果是操作了 Fn 键 + F1 的话，则操作的是 F1 的事件索引值， F1 的事件索引值为 0x86
+            // 操作这个的时候，F7是一个特例(key set 2 为 0x83, 但是返回的是0x80，这个在后面会做特殊处理)
         	table_entry = sskey2_overlay_table[temp];	// Get a sskey2 value.      
     }
 
@@ -177,7 +182,8 @@ void Send_Key(BYTE table_entry, BYTE event)
         table_entry = *pntr;    				// Get a sskey2. 
     }
 
-    // 这里传入的是键码2的键值
+    // 这里传入的值可能是键码2的值，也可能是键码的事件值，主要是看有没有按下FN这个功能按键
+    // 如果按下FN则表示 输入的是事件码，否则输入的是标准的键值码2
     sskey3_proc(table_entry, event);    		// Generate scan code, set 2.
 
 	Scanner_State = temp_scanner_state.byte;	// Update scanner state. 
@@ -222,7 +228,7 @@ void Clear_Fn_Keys(void)
  *       void) and takes a BYTE and a BYTE for parameters (B for BYTE, S for
  *       BYTE).
  * ------------------------------------------------------------------------- */
-// Key Code Process Table.
+// Key Code Process Table.  这个函数指针数组保存的是保存着处理不同数据的函数
 const FUNCT_PTR_V_BS code kcp_vector_table[] =
 {
     simple_code,        // index 00h DO_SIMPLE_CODE IBM key number 83,84 
@@ -235,22 +241,26 @@ const FUNCT_PTR_V_BS code kcp_vector_table[] =
     costomer_function	// index 07h DO_COSTOMER_FUNCTION costomer function key
 };
 
+// 键值处理
 static void sskey3_proc(BYTE sskey2, BYTE event)
 {
     BYTE code_byte;
     BYTE index;
     FLAG quick_key = 0;
 
-    if (sskey2 == 0)				// Null code 
+    if (sskey2 == 0)				// Null code  空键值
     {   			
         ;					 
     }
     else if ((sskey2 & 0x80) == 0)
     {
-     	simple_code(sskey2, event);	// 01h through 7Fh = scan code. 
+     	simple_code(sskey2, event);	// 01h through 7Fh = scan code.  单个键值发送处理
     }
-    else  							// 80h through FFh. 
+    else  							// 80h through FFh.  
     {   
+        // 例如我按下的是 Fn + F1 实际上事件码为 0x86 在下面操作之后 sskey2 = c0h = 12d
+        // 这个就是事件的索引码，又因为F1的功能键为睡眠模式，这个属于ACPI扫描码集，所以为E0 3f
+        // 这操作是通过index 找到相应的操作函数的索引码，然后通过相应函数保存键码值
         sskey2 &= 0x7F;
         sskey2 = sskey2 << 1;
 
