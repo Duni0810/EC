@@ -223,7 +223,7 @@ BYTE bRWSMBus(BYTE Channel,BYTE Protocol,BYTE Addr,BYTE Comd,XBYTE *Var,BYTE PEC
 			        *(Var+0x01) = *asSMBus[Channel].SMBusData1;
 		        }							            // read data2
 	        }
-            resutl = TRUE;
+            resutl = TRUE; 
         }
 
 	    *asSMBus[Channel].SMBusSTA=0xFE;	            // clear bits
