@@ -234,6 +234,7 @@ static void check_scan(BYTE changes, BYTE scan_address)
         // 例如我之前sense line 状态为 0x01, 现在的状态为0x04
         // 所以在之前进行 ITempB02 = (~ITempB02) ^ bscan_matrix[ITempB03] 操作是找到所以改变的按键
         // 这里的与操作是为了反找到改变的按键，就是0x40
+        // 实际上这里的 changes 为存在变化的混合的sense 状态， 按上面的例子，这里的 changes 为0x05(0x01 ^ 0x04)
 		change_make_key = changes & ~bscan_matrix[scan_address];
 
         // 改变的键值为 空
@@ -259,7 +260,8 @@ static void check_scan(BYTE changes, BYTE scan_address)
     bit_num = 0;
     while (changes != 0)
     {  
-        // 当前sense line 有按键按下 
+        // 当前sense line 有按键按下  
+        // change 为改变的状态混合关系
         if (changes & 0x01) 	/* Look at changes 1 bit at a time. */
 		{
             cscfnd(bit_num, scan_address);
@@ -279,6 +281,9 @@ static void check_scan(BYTE changes, BYTE scan_address)
 static void cscfnd(BYTE bit_num, BYTE scan_address)
 {
     // Byte_Mask(bit_num) = (1 << (bit_num))
+    // 实际上，在这个函数的前一个函数中已经有一个前提，就是在混合状态已经有检测到按键按下，这里
+    // 实际上就是判断上一个按键的状态如何，如果上一个按键是按下的，这里必然是弹起
+    // 所以只针对 通码与断码有关
     if (bscan_matrix[scan_address] & Byte_Mask(bit_num))
     {  
         if (scan.saf_break == 0) 
@@ -307,8 +312,8 @@ static void cscfnd(BYTE bit_num, BYTE scan_address)
  * ------------------------------------------------------------------------- */
 static void setup_debounce(BYTE bit_num, BYTE scan_address, BYTE event)
 {
-    new_keyh.field.output = scan_address;
-    new_keyh.field.input = bit_num;
+    new_keyh.field.output = scan_address;  // 保存 output 地址位
+    new_keyh.field.input = bit_num;        // 保存input地址位     通过这两个地址能确定唯一按键
     new_keyh.field.debounce_status = 1;
     new_keyl.field.state = 0;  /* Debounce has not counted out. */
     new_keyl.field.same = 0;   /* Key activity indication. */

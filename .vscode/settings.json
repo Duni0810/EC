@@ -57,6 +57,7 @@
         "OEM_MMB.C": "cpp",
         "OEM_MailBox.C": "cpp",
         "OEM_LCD.C": "cpp",
-        "OEM_SHA11.C": "cpp"
+        "OEM_SHA11.C": "cpp",
+        "OEM_ASM.C": "cpp"
     }
 }
