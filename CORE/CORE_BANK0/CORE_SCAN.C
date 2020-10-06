@@ -180,7 +180,6 @@ void Write_Strobe(BYTE scan_line_num) //default is High, Low effective
     // 例如循环到 第三行，则 设置为 1111 1111 1111 0111
 	if (scan_line_num<8)
    	{   
-
      	KSOL=~(0x01<<scan_line_num);
       	KSOH1=0xFF;
   	} else {
@@ -192,7 +191,7 @@ void Write_Strobe(BYTE scan_line_num) //default is High, Low effective
    		KSOH1=~(0x01<<(scan_line_num-0x08));
    	} 
 
-    // 判断有误外部键盘
+    // 判断有外部键盘
 	if(ExtendMatrix)
 	{
 		KSOH2 = 0xFF;
@@ -309,6 +308,8 @@ static void cscfnd(BYTE bit_num, BYTE scan_address)
  *     scan_address = number of bit of KO.
  *     bit_num = number of bit that changed from last KI to this KI for KO.
  *     event = contact event (MAKE_EVENT or BREAK_EVENT).
+ * 
+ *     bit_num: 范围在 0~7  scan_address: 范围在0~18
  * ------------------------------------------------------------------------- */
 static void setup_debounce(BYTE bit_num, BYTE scan_address, BYTE event)
 {
@@ -321,11 +322,15 @@ static void setup_debounce(BYTE bit_num, BYTE scan_address, BYTE event)
     if (event == MAKE_EVENT)
     {   /* For MAKE key (key pressed). */
         new_keyl.field.trans = 0;
+        
+        // 这个 参数好像没有任何意义， 在代码中被屏蔽了
         new_keyl.field.count = Ext_Cb2.field.Break_Count; /* Shouldn't this be Make_Count? */
     }
     else
     {   /* For BREAK key (key released). */
         new_keyl.field.trans = 1;
+
+        // 这个 参数好像没有任何意义 在代码中被屏蔽了
         new_keyl.field.count = Ext_Cb2.field.Make_Count; /* Shouldn't this be Break_Count? */
     }
 }
@@ -467,14 +472,18 @@ static FLAG find_paths(BYTE change_make_key, BYTE scan_address)
 /* ----------------------------------------------------------------------------
  * FUNCTION: debounce_key
  * ------------------------------------------------------------------------- */
+/// 这个函数是做消逗处理
 static void debounce_key(void)
 {							
     scan.scan_line = new_keyh.field.output;	
     Write_Strobe(scan.scan_line); 
-	CapDelay();	
-    ITempB01 = Read_Scan_Lines();
+	CapDelay();	                    // 延时15.26us
+
+    // 读取矩阵键盘感应线函数
+    ITempB01 = Read_Scan_Lines();   // 读取 input 的状态
 	//-----------------------------------
 	//Label:BLD_TIPIA_20160827_005
+    // 这里是干嘛的  ???
 	if(0x0F==scan.scan_line)
 	{
 		/*
@@ -492,20 +501,23 @@ static void debounce_key(void)
     ITempB01 = ~ITempB01;
 
     ITempB02 = Byte_Mask((BYTE) (new_keyh.field.input));	
-    ITempB02 = ITempB02 & ITempB01;
 
+    // 上一个与当前的状态作比较
+    ITempB02 = ITempB02 & ITempB01;  
+
+    // 
     if (ITempB02 != 0)
     {  
-        if (new_keyl.field.trans == 0) 
+        if (new_keyl.field.trans == 0)  // new_keyl.field.trans 为0 表示 通码
 		{
             new_keyl.field.same = 1;    // last key detected as a MAKE,  same = 1.
         }
-        else 
+        else   // 断码
 		{
             new_keyl.field.same = 0;    // last key detected as a BREAK, same = 0.
         }
     }
-    else
+    else  // 前一个与现在的状态不同，则表示
     { 
         if (new_keyl.field.trans == 0) 
 		{
@@ -539,6 +551,7 @@ static void debounce_key(void)
     else
 #endif
     { 
+        // 如果上一个按键与现在的按键状态不同，则现在按键无效，否则改变按键状态
         if (new_keyl.field.same == 0)
         {   
             new_keyh.byte = 0;	// Debounce failed. 
@@ -570,19 +583,34 @@ BYTE Read_Scan_Lines(void)
  * --------------------------------------------------------------- */
 static void change_valid(void)
 {
+    // input 8位 保存在临时变量中
     ITempB04 = Byte_Mask((BYTE) (new_keyh.field.input)); 
+
+    // output 16位按键状态
     ITempB03 = bscan_matrix[new_keyh.field.output]; 
+
+    // 找到上一个按键与现在按键的不同的地方
+    // 例如上一次按键的键值为100，这次的为001，则
+    // ITempB03 的值为101 
     ITempB03 = ITempB03 ^ ITempB04;
+
+    // 保存按键状态
     bscan_matrix[new_keyh.field.output] = ITempB03;   // bscan_matrix[]  write only one
 
+    // 初始化 按键事件
 	ITempB05 = BREAK_EVENT;           	// Ready for BREAK indication. 
+
+    // ITempB03 为混合不同值，ITempB04 为当前按键状态
+    // 这里的 & 状态为 找到现在按下的按键位置
     if ((ITempB04 & ITempB03) != 0)  // It's not same read agin
     {   						
         ITempB05 = MAKE_EVENT;
         typematic.byte = new_keyh.byte;	// Set New Typematic Key.
+
         scan.TMscale = TM_SCALE;
         bTMcount = bTMdelay;
 
+        // 不设置外部按键键值
 		etkeytypematic.byte = 0x00;
     }
 	
@@ -651,7 +679,7 @@ static void check_tm(union KEY key)
 /* ----------------------------------------------------------------
  * FUNCTION: Scan_Init - Initialize internal keyboard (scanner)
  * ---------------------------------------------------------------- */
-// 就是将所有的矩阵输入线设置为低电平
+// 就是将所有的矩阵输出线设置为低电平
 void Scan_Init(void)				// Lower all KSO lines for scan matrix
 {
  	KSOL  = 0x00;  
@@ -679,6 +707,7 @@ void Scan_Init(void)				// Lower all KSO lines for scan matrix
  * Then, if the internal keyboard (scanner) is enabled, allow the interrupt to
  * occur when a key is pressed on the scanner.
  * -------------------------------------------------------------- */
+// 初始化所有的矩阵按键状态，并使能按键中断
 void Enable_Any_Key_Irq(void)	// Lower all KSO lines for scan matrix
 {
 	KSOL=0x00;             
@@ -708,6 +737,7 @@ void Enable_Any_Key_Irq(void)	// Lower all KSO lines for scan matrix
  * dispatched by the main service loop.  At that time the data will be sent to
  * the Host via the "SEND" service handler.
  * ------------------------------------------------------------------------- */
+// 使能定时器，并重装载定时器数值
 void Start_Scan_Transmission(void)
 {
     //Load_Timer_B();
@@ -719,9 +749,12 @@ void Start_Scan_Transmission(void)
  * FUNCTION:   Check_Scan_Transmission
  *
  * See if the scanner keyboard data transmission (to Host) should be allowed.
+ * 查看是否应允许扫描仪键盘数据传输到主机。
  *
  * Return: Transmission status indication.  TRUE if ok to transmit.
+ * 传输状态指示。 如果可以传输，则为TRUE。
  * ------------------------------------------------------------------------- */
+// 如果buffer 不为空，则返回TRUE
 FLAG Check_Scan_Transmission(void)
 {
     FLAG allow_transmission = FALSE;
@@ -746,6 +779,8 @@ FLAG Check_Scan_Transmission(void)
  *
  * Returns: 0 = U.S. keyboard, 1 = Japanese keyboard.
  * -------------------------------------------------------------- */
+// 获取键盘类型，美式键盘返回1，日式键盘返回0
+// 这里统一使用美式键盘
 FLAG Get_Kbd_Type(void)
 {						// Check keyboard type here
 						// Returns: 0 = U.S. keyboard, 1 = Japanese keyboard.
@@ -765,6 +800,7 @@ FLAG Get_Kbd_Type(void)
  * Lock out the scanner via "Scan_Lock" and clear pending scanner "SEND"
  * events.
  * ------------------------------------------------------------------------- */
+// 将扫描仪锁定
 void Lock_Scan(void)
 {
     Int_Var.Scan_Lock = 1;
@@ -774,11 +810,13 @@ void Lock_Scan(void)
 /* ----------------------------------------------------------------------------
  * FUNCTION: Init_Kbd - Scanner Keyboard Initialization.
  * ------------------------------------------------------------------------- */
+// 解锁扫描仪
 void Unlock_Scan(void) 
 {
 	Int_Var.Scan_Lock = 0;
 }
 
+// 检测是否支持外部按键
 void CheckKSO1617Support(void)
 {
 	ExtendScanPin = 0x00;
@@ -810,18 +848,21 @@ void CheckKSO1617Support(void)
 /* ----------------------------------------------------------------------------
  * FUNCTION: Init_Kbd - Scanner Keyboard Initialization.
  * ------------------------------------------------------------------------- */
+// 初始化键盘状态
 void Init_Kbd(void)
 {
 	CheckKSO1617Support();
 
 	Scan_Init();  
 
+    // 键盘键值初始化
 	Hook_Setup_Scanner_Pntr();
-    Setup_Diode_Key();          // ???
+    Setup_Diode_Key();          // 是否是机械键盘
 
     new_keyh.byte = 0;
     new_keyl.byte = 0;
 
+    // 初始化外部键盘状态
  	ClearExtendKeys();	// for extend keys
 
     Clear_Fn_Keys();
@@ -842,6 +883,7 @@ void Init_Kbd(void)
 /* ----------------------------------------------------------------------------
  * FUNCTION:   Setup_Diode_Key
  * ------------------------------------------------------------------------- */
+// 判断机械键盘
 void Setup_Diode_Key(void)
 {
  	if(1)
@@ -859,6 +901,7 @@ void Setup_Diode_Key(void)
 /* ----------------------------------------------------------------------------
  * FUNCTION: Clear_Key - Clear local keyboard buffer and related variables.
  * ------------------------------------------------------------------------- */
+// 清除本地键盘缓冲区和相关变量。
 void Clear_Key(void)
 {
     BYTE i;
@@ -887,6 +930,7 @@ void Clear_Key(void)
 /* ----------------------------------------------------------------------------
  * FUNCTION: Clear_Typematic - Set default typematic delay and clear type-matic action.
  * ------------------------------------------------------------------------- */
+// 设置默认的类型延迟和清除类型操作。
 void Clear_Typematic(void)
 {
     typematic.byte = 0;
@@ -915,6 +959,7 @@ const BYTE code repeat_tbl[] =
 };
 const BYTE code delay_tbl[] = {25, 50, 75, 100};
 
+// 设置按键的击键速率/延迟。
 void Set_Typematic(WORD type_rate)
 {
     Save_Typematic = type_rate;   /* Save for suspend/resume. */
@@ -981,10 +1026,13 @@ void service_scan(void)
  *
  * Get data byte from keyboard buffer (if not empty) and update "scan.kbf_head"
  * with new index into keyboard buffer.
+ * 
+ * 从键盘缓冲区中获取数据字节（如果不为空），并使用新索引将“ scan.kbf_head”更新到键盘缓冲区中。
  *
  * Return: Data from buffer (WORD of all 1's if buffer is empty).
+ * 返回值：来自缓冲区的数据（如果缓冲区为空，则为全1的WORD）。
  * ------------------------------------------------------------------------- */
-//WORD Get_Buffer(void)
+// 获取buffer
 BYTE Get_Buffer(void)
 {
     //WORD buffer_data;
@@ -1009,6 +1057,7 @@ BYTE Get_Buffer(void)
 /* ----------------------------------------------------------------------------
  * FUNCTION:   Buffer_Mark - Mark local keyboard buffer tail.
  * ------------------------------------------------------------------------- */
+// 标记本地键盘缓冲区尾部。
 void Buffer_Mark(void)
 {
     scan.kbf_mark = scan.kbf_tail;   /* Copy scan.kbf_tail to scan.kbf_mark. */
@@ -1019,12 +1068,20 @@ void Buffer_Mark(void)
  *
  * Input:  Row/Column (0iii,oooo) to put in buffer.
  * Return: TRUE operation successful, FALSE unsuccessful.
+ * 
+ * 输入：要放入缓冲区的行/列（0iii，oooo）。
+ * 返回值：TRUE操作成功，FALSE不成功。
+ * 
  * ------------------------------------------------------------------------- */
+// 将数值放入buffer
 FLAG Buffer_Key(BYTE row_column)
 {
     FLAG ready = TRUE;  /* Ready for successful operation */
 
+    // 将数据存储到缓冲区尾部
     bKEY_BUFF[scan.kbf_tail] = row_column;  /* Store Data to Buffer Tail */
+
+    // 增量缓冲区尾部（指针）
     scan.kbf_tail++;                        /* Increment Buffer Tail (pointer) */
 
     if (scan.kbf_tail >= KBF_SIZE) 
@@ -1052,6 +1109,11 @@ FLAG Buffer_Key(BYTE row_column)
  *
  * Input:  Pointer to null terminated string.
  * Return: 0x80 if buffer overflow error, else 0.
+ * 
+ * 将字符串放置在本地键盘缓冲区中（不带终止NULL）。 调用Buffer_Key将数据放入密钥缓冲区。
+ * 输入：指向空终止字符串的指针。
+ * 
+ * 返回值：如果缓冲区溢出错误，则返回0x80，否则返回0。
  * ------------------------------------------------------------------------- */
 BYTE Buffer_String(const BYTE *pntr)
 {
@@ -1067,12 +1129,21 @@ BYTE Buffer_String(const BYTE *pntr)
     return (error);
 }
 
+
+
+
+
+/********************************以下是关于扩展按键的函数******************************/
+
+
+
 //*****************************************************************
 // The functions of extend keys
 //*****************************************************************
 //-----------------------------------------------------------------
 // The function of Scaning extend keys
 //-----------------------------------------------------------------
+// 外部键盘的扫描
 BYTE bScanExtendKeys(void)
 {
 	ITempB06 = FALSE;
@@ -1139,6 +1210,7 @@ BYTE bScanExtendKeys(void)
 
 //-----------------------------------------------------------------
 // The function of Setting extend scan lines
+// 设置扩展扫描线的功能
 //-----------------------------------------------------------------
 void SetExtendScanLines(BYTE scan_line)
 {

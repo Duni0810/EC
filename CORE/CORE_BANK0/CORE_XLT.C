@@ -101,7 +101,8 @@ void Send_Key(BYTE table_entry, BYTE event)
     // 保存键盘的扫描状态
     temp_scanner_state.byte = Scanner_State;
 
-    // 功能按键 fn键操作
+    // 功能按键 fn键操作, table_entry 为输入的键值，SSKEY2_OVL_CODE 为0xE0
+    // 键值中大于0xE0的按键为 F1~F12，右侧的功能按键和空格
     if (table_entry >= SSKEY2_OVL_CODE)				// Fn key + any key.
     {   
         /*
@@ -141,6 +142,7 @@ void Send_Key(BYTE table_entry, BYTE event)
                     // 与前一个按键键值相同
     				if(table_entry_bk==temp_table_entry)				
                     {
+                        // 增加索引以获得表条目的奇数字节
                         temp++;     // Increment index to get the odd byte of table entry 
                     }
                     table_entry_bk = 0x00;
@@ -171,7 +173,7 @@ void Send_Key(BYTE table_entry, BYTE event)
         	table_entry = sskey2_overlay_table[temp];	// Get a sskey2 value.      
     }
 
-    // 复合按键 好像不会进到这里
+    // 复合按键 好像不会进到这里,因为键值范围没有在0x9C~0xE0 之间的
     else if (table_entry >= SSKEY2_SPE_CODE)		// Combination Key
     {  
         temp = (table_entry - SSKEY2_SPE_CODE); 	// Get index into table. 

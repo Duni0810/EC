@@ -123,7 +123,7 @@ const sREG_INIT code Core_reg_init_table[] =
                                                 // 这里定义的基地址2E, 2F 
 
     	{ &SWCBALR      ,Core_Init_SWCBALR  },
-    	{ &SWCBAHR      ,Core_Init_SWCBAHR  }, // 配置地址为0x002E？？
+    	{ &SWCBAHR      ,Core_Init_SWCBAHR  }, // 配置地址为0x002E？？ 设置 SWUC Host Interface registers
 		{ &RSTS			,0x84				}, // 这个复位不应该在最前面执行的么？	
 
 // KBC and PM interface

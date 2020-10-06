@@ -49,6 +49,8 @@ union Unew_keyl
         FIELD trans: 1; /* Bit[1]   1 for BREAK. 0 for MAKE. */
         FIELD intm:  1; /* Bit[2] 	*/
         FIELD ghost: 1; /* Bit[3]   Ghost key indicator. */
+
+        // 1 =上次key activity与这次相同。
         FIELD same:  1; /* Bit[4]   1 = key activity last time was SAME as this time. */
         FIELD count: 3; /* Bit[5:7] Debounce counter. */
     }field;

@@ -1182,7 +1182,7 @@ void Et_CheckKBS3Wake(BYTE BKSI,BYTE BKSO)
 //----------------------------------------------------------------------------
 void OEM_Hook_Send_Key(BYTE table_entry, BYTE event)
 {
-	// 只要系统不为 正常工作状态，就执行if函数
+	// 只要系统不为正常工作状态(S0)，就执行if函数
     if(SystemNotS0)  // 系统不为S0状态
     {  	
         CheckBootHotKey(table_entry,event);

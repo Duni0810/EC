@@ -35,7 +35,7 @@ void FuncAt_0xFE00(void)
 }
 
 //-----------------------------------------------------------------------------
-// The function of EC flash
+// The function of EC flash  地址链接到 0xFE00
 //-----------------------------------------------------------------------------
 //Label:BLD_TIPIA_20160905_007
 void FlashECCode(void)
