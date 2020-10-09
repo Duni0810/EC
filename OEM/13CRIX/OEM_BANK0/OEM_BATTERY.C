@@ -439,7 +439,8 @@ void BAT1GoodOrBad(void)
 	{
 		BAT1_BADCunt = 0;
 		CLEAR_MASK(Bios_Battery_Health_2,MBBD);
-	}
+
+	}
 }
 
 #endif
@@ -1519,7 +1520,7 @@ BYTE DisableCharger(void)
 }
 
 
-
+// 这个函数没有用
 void Battey1FrimUp(void)    // 10ms  timebase   in s0
 {
 	if (IS_MASK_SET(SYS_MISC1, Bat1_Firm_En))
@@ -1731,6 +1732,7 @@ void Battery_Storage_Mode(void)
 
 }
 
+// 这个函数没有被使用
 void Lenovo_Battery_Health(void)
 {	
 	if(BAT_Storagemode_Step != BAT_Storagemode_Check)

@@ -232,8 +232,8 @@ extern XBYTE OS_BIOS;
 #define F1_F12_Mode			BIT0	//TF_012++
 //J80_007A++<<
 extern XBYTE Oem_For_Bios_Flag;			 
-#define Forreset			BIT0    //when set,do not shutdown southbridge
-#define EC_flashed			BIT1	//ec has been flashed should reset ec domain 
+#define Forreset			BIT0    //when set,do not shutdown southbridge 设置后，请勿关闭南桥
+#define EC_flashed			BIT1	//ec has been flashed should reset ec domain ec已刷新，应重置ec域
 
 extern XBYTE ECMainVersionInfo;			  	
 extern XBYTE ECVersionInfo;				 	

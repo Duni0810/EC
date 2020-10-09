@@ -40,11 +40,11 @@
 #define SC_4SEC		        0x03	// System shutdown by power button 4 sec overwrite
 #define SC_CPUHOT		    0x04	// System shutdown by CPU too hot to shutdown
 #define SC_HWPGSx_S0Off		0x05	// System shutdown by HWPG Fail in Sx_S0 power sequence
-#define SC_HWPS0Off		    0x06	// System shutdown by HWPG Fail in S0
+#define SC_HWPS0Off		    0x06	// System shutdown by HWPG Fail in S0 在S0中，HWPG关闭系统失败
 #define SC_PowerOnWatchDog  0x07    // System shutdown by Power on WDT
-#define SC_BATTOOLOW        0x08    // battery is deplieted
+#define SC_BATTOOLOW        0x08    // battery is deplieted  电池耗尽
 
-#define SC_PSW_PRESS        0x09
+#define SC_PSW_PRESS        0x09	// 长按关机键  power switch（PSW）
 #define SC_Sys_Reset        0x0A
 #define SC_Sys_ShutDn       0x0B
 
