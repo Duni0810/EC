@@ -98,15 +98,15 @@ extern void Service_HI2C_Interface(void);
 
 typedef struct SCS
 {
-	BYTE	protocol;
-    BYTE  	address;
-    BYTE  	cmd;
-    XBYTE 	*smbdata;	
-	BYTE	Conditionflag;
-	XBYTE	*ConditionVar;
+	BYTE			protocol;
+    BYTE  			address;
+    BYTE  			cmd;
+    XBYTE 		   *smbdata;	
+	BYTE			Conditionflag;
+	XBYTE		   *ConditionVar;
 	FUNCT_PTR_V_V	hookfunc;
 	FUNCT_PTR_V_V	errorfunc;
-	BYTE	Bcunt;
+	BYTE			Bcunt;
 	//BYTE	data1;
 	//BYTE	data2;
 } sSCS;

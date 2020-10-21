@@ -17,19 +17,23 @@ const BYTE code initsio_table[]=
   	0x70 ,0x01,	// Set IRQ=01h for Logical Device 06h(KBD)
   	0x30 ,0x01,	// Enable Logical Device 06h(Mouse)
   	0x71 ,0x03,	//J80_017++
+
 				// Configure and Enable Logical Device 05h(Mouse)
  	0x07 ,0x05,	// Select Logical Device 05h(Mouse)
   	0x70 ,0x0C,	// Set IRQ=0Ch for Logical Device 05h(Mouse)
 	0x30 ,0x01,	// Enable Logical Device 05h(Mouse)
 	0x71 ,0x03,	//J80_017++
+
 				// Enable Logical Device 11h(PM1)
    	0x07 ,0x11,	// Select Logical Device 11h(PM1)
   	0x70 ,0x00,	// Clear IRQ=0 for  Logical Device 11h(PM1)
  	0x30 ,0x01,	// Enable Logical Device 11h(PM1)
+
 				// Enable Logical Device 12h(PM2)
 	0x07 ,0x12,	// Select Logical Device 12h(PM2)
 	0x70 ,0x00,	// Clear IRQ=0 for  Logical Device 12h(PM2)
 	0x30 ,0x01,	// Enable Logical Device 12h(PM2)
+
 				// Enable Logical Device 04h(MSWC)
  	0x07 ,0x04,	// Logical Device 04h(MSWC)
  	0x30 ,0x00,	// Enable MSWC 
@@ -80,9 +84,9 @@ void InitSio(void)
     BYTE code * data_pntr;
     BYTE cnt;
 
-  	SET_MASK(LSIOHA,LKCFG);
-  	SET_MASK(IBMAE,CFGAE);
-  	SET_MASK(IBCTL,CSAE);
+  	SET_MASK(LSIOHA,LKCFG);		// 禁能主机对BRAM寄存器的访问
+  	SET_MASK(IBMAE,CFGAE);		// 启用对PNPCFG寄存器的EC访问
+  	SET_MASK(IBCTL,CSAE);		// EC对I-Bus的访问已启用。 在IBMAE寄存器中选择要访问的模块
 
     cnt=0;
     data_pntr=initsio_table;

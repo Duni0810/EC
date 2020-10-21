@@ -7,9 +7,11 @@
  *        Please follow your project software specification to do some modification.
  *---------------------------------------------------------------------------*/
 
+// 这整个文件没有使用
 #include <CORE_INCLUDE.H>
 #include <OEM_INCLUDE.H>
 
+// 没用到
 void HandleMailBox(void)
 {
 	if(SystemNotS0)

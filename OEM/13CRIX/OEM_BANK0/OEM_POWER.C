@@ -197,8 +197,8 @@ void PCIRST_H(void)
 
 void PCIRST_L(void)
 {
-	PCIRST1_LO(); // GPF4
-	PCIRST2_LO(); // GPF5
+	PCIRST1_LO(); // GPF4		m.2 SSD 电源
+	PCIRST2_LO(); // GPF5	
 	//TF_008A--	if(SysPowState != SYSTEM_S0_S3)	
 	
 	// IS_BOARD_ID1_LO = GPA5
@@ -252,7 +252,7 @@ void PCIRST3_L(void)
 {
 	// GPA5 这个引脚从原理图上看有上拉电阻 
 	// 所以，原则上不会进入if 里面
-	if(IS_BOARD_ID1_LO()) //TF_008A++ 
+	if(IS_BOARD_ID1_LO()) //TF_008A++  GPA5
 		PCIRST3_LO();		// GPE5
 	POWER_RAMDEBUG(0x23);
 }
@@ -296,7 +296,7 @@ const sPowerSEQ code asPowerSEQS0S5[]=
 	{ PCIRST_L,		        0,		 0,	},  // 7				GPF4 GPF5 GPE5  ---> 0
     { PX_EN2_L,		      220,		 0,	},  // 4				GPH1			---> 0
 	{ PX_EN_L,		        0,		 0,	},  // 4				GPH4			---> 0
-	{ V1P8_EN_L,		   30,		 0, },	// 4	//J80_012++ GPE1			---> 0
+	{ V1P8_EN_L,		   30,		 0, },	// 4	//J80_012++ 				---> 0
 	{ VCOR_DisEnable,	   20,		 0, },	// 4				GPH0			---> 0
 	{ VTT_EN_L, 		   20,		 0, },	// 9				GPH3			---> 0
 	{ VDD_EN_L, 		   60,		 0, },	// 9				GPA0			---> 0
@@ -535,15 +535,16 @@ void S0_SXCommVar(void)
 	{
 		ChangePLLFrequency(PLLFreqSetting03);
 	}	
+
 	FIN_PWR_EN_OFF();				// GPG2 
-	M2PWR_ENT_OFF();				// GPJ0
-	MUTE_OFF();						// GPJ1
+	M2PWR_ENT_OFF();				// GPJ0	
+	MUTE_OFF();						// GPJ1 	
 	CAM_PWR_EN_OFF();				// GPC5
 	WIFI_ENABLE_OFF();				// GPC7
 	TPS2546_CTL1_LO();				// GPB0
 	BT_EN_OFF();					// GPG6
 	Process_KBLED_Control(SET_KBLED_ON,SYSTEM_S5);  // 控制键盘指示灯
-  	LCD_CTRL = 0;	
+  	LCD_	CTRL = 0;	
 	BL_ENABLE_EC_LO();				// GPB2
 }
 
@@ -587,7 +588,7 @@ void S0_S5Variable(void)
 	// USB Power Set off
 	//==================================
 	// USB postposition port 1-3
-	FUSB3_PWREN_L();
+	FUSB3_PWREN_L();		// GPB1， GPF2  ---> 0
 
 	// 清除状态
 	CLEAR_MASK(EVT_STATUS2, Sys_Shutdown_f);		
@@ -1181,7 +1182,7 @@ void EnterDeepSleep(void)
         ISR15 |= Int_WKO122;	
         IER15 |= Int_WKO122;
 	}
-	else                   //AC in  system  电池接入
+	else                   //AC in  system  适配器接入
 	{	
 		GPCRI4 = INPUT;       //battery in   WU20   INT1 
 
@@ -1231,7 +1232,7 @@ void EnterDeepSleep(void)
 	IER4=0x00;
 	IER15=0x00;
 	
-	// 禁中断 清中孤单
+	// 禁中断 清中断
 	IER1=0x00;
 	ISR1=0xff;
 	

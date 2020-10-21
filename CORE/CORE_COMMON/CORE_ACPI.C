@@ -18,6 +18,7 @@
 //-----------------------------------------------------------------------------
 // FUNCTION: Loop Delay - Delay a number of microseconds.
 // Input:  0x00 - 0xFF for delay timing.
+// 这个延时没有被使用
 //-----------------------------------------------------------------------------
 void Loop_Delay(BYTE delay)
 {
@@ -30,6 +31,7 @@ void Loop_Delay(BYTE delay)
 
 //----------------------------------------------------------------------------
 // Process Command/Data received from System via the 2nd Host interface
+// 通过第二主机接口处理从系统接收的命令/数据
 //----------------------------------------------------------------------------
 void service_pci2(void)
 {
@@ -37,7 +39,8 @@ void service_pci2(void)
     {
 		return; 
     }
-	SetTotalBurstTime();	// Set Burst mode total time (2ms)
+	// 这个时间是不是处理服务的时间？？？
+	SetTotalBurstTime();	// Set Burst mode total time (2ms) 设置突发模式总时间 2ms
  	service_pci2f();		// Process Command/Data 	
 }
 

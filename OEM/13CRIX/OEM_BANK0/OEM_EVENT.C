@@ -5,12 +5,15 @@
  *
  * Note : These functions are reference only.
  *        Please follow your project software specification to do some modification.
+ * 
+ *     这个文件好像是说明电源事件的
  *---------------------------------------------------------------------------*/
 
 #include <CORE_INCLUDE.H>
 #include <OEM_INCLUDE.H>
 
 
+// 这个函数没有被调用
 void Auto_NOTIFY_EM(BYTE adata)
 {
 	VPC_Lenovo|=Genenal_Bit_vpc;
@@ -25,6 +28,8 @@ void Auto_NOTIFY_EM(BYTE adata)
 	}
 	//J80_013--	ECQEvent(NOTIFY_EM_EVT,SCIMode_Normal);
 }
+
+// 这个函数没有被调用
 void Check_notify_em(void)
 {
 	if(Device_Status_AllRF&Super_performance_F)
@@ -36,8 +41,7 @@ void Check_notify_em(void)
 }
 
 //-----------------------------------------------------------------------------
-// no change function
-
+// no change function 空事件，空函数
 //-----------------------------------------------------------------------------
 void NullEvent(void)
 {
@@ -45,7 +49,7 @@ void NullEvent(void)
 }
 
 //-----------------------------------------------------------------------------
-// Adapter in function
+// Adapter in function  适配器插入
 //-----------------------------------------------------------------------------
 void AdapterIn(void)
 {
@@ -56,7 +60,7 @@ void AdapterIn(void)
 }
 
 //-----------------------------------------------------------------------------
-// Adapter out function
+// Adapter out function 适配器拔出
 //-----------------------------------------------------------------------------
 void AdapterOut(void)
 {
@@ -67,7 +71,7 @@ void AdapterOut(void)
 }
 
 //-----------------------------------------------------------------------------
-//power button was pressed
+//power button was pressed  按下电源按键
 //-----------------------------------------------------------------------------
 void PSWPressed(void)
 {
@@ -107,7 +111,7 @@ void PSWPressed(void)
 			{
 			//J80_007A++<<
 				//J80_007++>>
-				e0_prefix_code(0x37,MAKE_EVENT);
+				e0_prefix_code(0x37,MAKE_EVENT);	// 这个是ACPI扫描码  ，0x37表示的是power
 				e0_prefix_code(0x37,BREAK_EVENT);
 				//J80_007++<<
 			//J80_007A++>>
@@ -132,6 +136,7 @@ void PSWReleased(void)
 
 //-----------------------------------------------------------------------------
 //power button was overrided (press or release)   10ms time base
+//长按电源按钮， 强制关机
 //-----------------------------------------------------------------------------
 void PSWOverrided(void)
 {
@@ -165,6 +170,7 @@ void HW_Reset_Press(void)
 {
 }
 
+// 硬件复位俺就弹起
 void HW_Reset_Released(void)
 {
 	if(SystemIsS0)
@@ -179,7 +185,7 @@ void HW_Reset_Released(void)
 }
 
 //-----------------------------------------------------------------------------
-// LID  close
+// LID  close  笔记本电脑合上盖子事件
 //-----------------------------------------------------------------------------
 void LID_CLOSE(void)
 {
@@ -193,7 +199,7 @@ void LID_CLOSE(void)
 }
 
 //-----------------------------------------------------------------------------
-// LID  close
+// LID  open  打开盖子事件
 //-----------------------------------------------------------------------------
 void LID_OPEN(void)
 {
@@ -239,19 +245,19 @@ void EventManager(BYTE device_id)
 	switch(device_id)	
 	{
 		case 0 :							
-			new_state = Read_NBSW();    // power button
+			new_state = Read_NBSW();    // power button  获取按键状态
 			break;
 			
 		case 1 :     							
-			new_state = Read_ACIN();   // AC
+			new_state = Read_ACIN();   // AC			获取适配器状态
 			break;
 			
 		case 2 :
-			new_state = Read_BatIN();  // battery
+			new_state = Read_BatIN();  // battery		获取电池状态
 			break;
 			
 		case 3 :
-			new_state = Read_LID();    // Lid
+			new_state = Read_LID();    // Lid			获取笔记本盖子状态
 			break;
 			
 		case 4 :

@@ -59,5 +59,6 @@
         "OEM_LCD.C": "cpp",
         "OEM_SHA11.C": "cpp",
         "OEM_ASM.C": "cpp"
-    }
+    },
+    "C_Cpp.clang_format_sortIncludes": true,
 }

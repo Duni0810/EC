@@ -16,7 +16,8 @@
 //----------------------------------------------------------------------------
 // Handle OEM ACPI command 8x.
 //----------------------------------------------------------------------------
-void OEM_ACPI_Cmd_80(void)
+void OEM_ACPI_Cmd_80(void)
+
 {
     if(IS_MASK_SET(SYS_MISC1,ACPI_OS))  // ACPI mode
     {
@@ -27,7 +28,8 @@ void OEM_ACPI_Cmd_80(void)
     }
 }
 
-void OEM_ACPI_Cmd_81(void)
+void OEM_ACPI_Cmd_81(void)
+
 {
     if(IS_MASK_SET(SYS_MISC1,ACPI_OS))  // ACPI mode
     {
@@ -38,17 +40,20 @@ void OEM_ACPI_Cmd_81(void)
   	}
 }
 
-void OEM_ACPI_Cmd_82(void)
+void OEM_ACPI_Cmd_82(void)
+
 {
     ECCheckBurstMode = 1;
 }
 
-void OEM_ACPI_Cmd_83(void)
+void OEM_ACPI_Cmd_83(void)
+
 {
     ECCheckBurstMode = 0;
 }
 
-void OEM_ACPI_Cmd_84(void)
+void OEM_ACPI_Cmd_84(void)
+
 {
 	ITempB05 = 0x00;
 	if (SCI_Event_Out_Index != SCI_Event_In_Index)
@@ -70,21 +75,25 @@ void OEM_ACPI_Cmd_84(void)
 	}
 }
 
-void OEM_ACPI_Cmd_86(void)
+void OEM_ACPI_Cmd_86(void)
+
 {
     SET_MASK(SYS_MISC1,ACPI_OS);
 }
 
-void OEM_ACPI_Cmd_87(void)
+void OEM_ACPI_Cmd_87(void)
+
 {
     CLEAR_MASK(SYS_MISC1,ACPI_OS);
 }
 
-void OEM_ACPI_Cmd_8E(void)
+void OEM_ACPI_Cmd_8E(void)
+
 {
 	SET_MASK(UtilityFlag, SMBusDebug);
 }
-void OEM_ACPI_Cmd_8F(void)
+void OEM_ACPI_Cmd_8F(void)
+
 {
 	CLEAR_MASK(UtilityFlag, SMBusDebug);
 }
@@ -92,12 +101,14 @@ void OEM_ACPI_Cmd_8F(void)
 //----------------------------------------------------------------------------
 // Handle OEM ACPI command Dx.
 //----------------------------------------------------------------------------
-void OEM_ACPI_Cmd_D8(void)
+void OEM_ACPI_Cmd_D8(void)
+
 {
 
 }
 
-void OEM_ACPI_Cmd_DD(void)
+void OEM_ACPI_Cmd_DD(void)
+
 {
 
 }

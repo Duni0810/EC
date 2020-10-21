@@ -944,6 +944,8 @@ void ECDisableExternalTimer1(void)
 
 #endif
 
+
+// 以下几个函数虽然被调用，但是调用的函数一直没有被使用
 /*-----------------------------------------------------------------------------
  * @subroutine - i2c_read_reg
  * @function - i2c_read_reg

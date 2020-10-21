@@ -14,6 +14,7 @@
 
 //-----------------------------------------------------------------------
 // Process Command/Data received from System via the KBC interface
+// 通过KBC接口处理从系统接收的命令/数据
 //-----------------------------------------------------------------------
 void service_pci1(void)
 {
@@ -33,7 +34,7 @@ void service_pci1(void)
         Core_64Port(KBHICmd);  // 处理指令值
         Hook_64Port(KBHICmd);  // 这个钩子函数做的事处理厂商定义
 
-        // 判断指令是否需要相应，并且KBC发送数据给主机
+        // 判断指令是否需要响应，并且KBC发送数据给主机
  	    if ( KbdNeedResponseFlag ) 
 	    {
 		    KbdNeedResponseFlag = 0;
@@ -544,6 +545,7 @@ void Cmd_E0(void)
 
 //-----------------------------------------------------------------------
 // Handle 64 port command Fx.
+// 这个函数一直都是空函数，只有延时几个时钟周期
 //-----------------------------------------------------------------------
 void Cmd_FX(void)
 {
@@ -569,16 +571,16 @@ void Cmd_FX(void)
 
 		*/
 
-		Hook_A20OFF();
-		Hook_KBRSTON();
+		Hook_A20OFF();  // 空函数
+		Hook_KBRSTON(); // 空函数
 //		Delay1MS(64);  // Delay. 
 		WNCKR = 0x00;           // Delay 15.26 us
 		WNCKR = 0x00;           // Delay 15.26 us
 		WNCKR = 0x00;           // Delay 15.26 us
 		WNCKR = 0x00;           // Delay 15.26 us
 		WNCKR = 0x00;           // Delay 15.26 us
-		Hook_A20ON();
-		Hook_KBRSTOFF();
+		Hook_A20ON();           // 空函数
+		Hook_KBRSTOFF();        // 空函数
 
 	
     }							// Odd command do no thing	
@@ -1302,6 +1304,7 @@ BYTE Read_Output_Port_2(void)
 
 //----------------------------------------------------------------------------
 // The function of processing 60 port
+// 60 端口是数据端口
 //----------------------------------------------------------------------------
 void Core_60Port(BYTE KBHIData)
 {
@@ -1374,6 +1377,7 @@ void Core_60Port(BYTE KBHIData)
 
 //----------------------------------------------------------------------------
 // The function of processing 64 port
+// 64端口是指令端口
 //----------------------------------------------------------------------------
 void Core_64Port(BYTE KBHICmd)
 {
@@ -1550,6 +1554,7 @@ void Core_64Port(BYTE KBHICmd)
 //      none
 //
 //*****************************************************************************
+// 延时两个时钟周期
 void ShortDelayAfterWriteDOR(void)
 {
     WNCKR = 0x00;                   // Delay 15.26 us

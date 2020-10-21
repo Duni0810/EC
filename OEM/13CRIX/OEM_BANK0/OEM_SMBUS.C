@@ -18,6 +18,7 @@
 
 //----------------------------------------------------------------------------
 // [rblk_bcis] the byte count of read smbus read block protocol
+// 在块读取操作中 获取 SMBUS 个数
 //----------------------------------------------------------------------------
 void Hook_GetSMBusReadBlockByteCount(BYTE rblk_bc)
 {
@@ -26,6 +27,7 @@ void Hook_GetSMBusReadBlockByteCount(BYTE rblk_bc)
 
 //----------------------------------------------------------------------------
 // Read thermal sensor OK
+// 这个函数没有用到
 //----------------------------------------------------------------------------
 void Hook_PollThermal(void)
 {
@@ -41,7 +43,8 @@ void Error_PollThermal(void)
 }
 
 //----------------------------------------------------------------------------
-// For SMBus utility only
+// For SMBus utility only  做 SMBUS 调试
+// 这个函数没有用到
 //----------------------------------------------------------------------------
 void Hook_SMBDebug(void)
 {
@@ -59,13 +62,15 @@ void Error_SMBDebug(void)
 
 //----------------------------------------------------------------------------
 // Polling batter 1 data OK
+// 这个函数没有用到
 //----------------------------------------------------------------------------
 void BAT1_Read_FCcap_OK(void)
 {
 	if(OS_mode != 0)
 	{
+		// BAT最后一次完全充电容量
 		if(BAT1_FCcap_Pre != ( BAT1_FCcap_L | ( BAT1_FCcap_H<< 8)))
-			ECQEvent(BAT1_HOT_PLUG_EVT,SCIMode_Normal);
+			ECQEvent(BAT1_HOT_PLUG_EVT, SCIMode_Normal);
 	}	
 	
 	BAT1_FCcap_Pre = ( BAT1_FCcap_L | ( BAT1_FCcap_H<< 8));
@@ -73,6 +78,7 @@ void BAT1_Read_FCcap_OK(void)
 	
 //----------------------------------------------------------------------------
 // Polling batter 1   data OK
+// // 这个函数没有用到
 //----------------------------------------------------------------------------
 void BAT1_Read_RMCAP_OK(void)
 {
@@ -96,6 +102,7 @@ void BAT1_Read_RMCAP_OK(void)
 
 //----------------------------------------------------------------------------
 // Polling batter 1 data OK
+// 读取电池状态
 //----------------------------------------------------------------------------
 void BAT1_Read_OK(void)
 {
@@ -104,9 +111,11 @@ void BAT1_Read_OK(void)
 
 //----------------------------------------------------------------------------
 // battery data is ready
+// 
 //----------------------------------------------------------------------------
 void BAT1_Read_Pass(void)
 {
+	// 检测到电池已装入，在电池数据准备就绪后发送一次Qevent。
 	if(IS_MASK_SET(BT1_STATUS1,Bat1_In_Event))	//detect battery is in, send Qevent once after battery data is ready.
 	{
 		//J80_013--	ECQEvent(BAT1_HOT_PLUG_EVT,SCIMode_Normal);	
@@ -117,6 +126,7 @@ void BAT1_Read_Pass(void)
 
 //----------------------------------------------------------------------------
 // Polling batter 1 data Fail
+// 电池读取失败
 //----------------------------------------------------------------------------
 void BAT1_Read_Fail(void)
 {
@@ -125,6 +135,7 @@ void BAT1_Read_Fail(void)
 }
 
 
+// 温度传感器读取成功
 void TempSensor_Read_OK(void)
 {
 	TEMP_SENSOR_STATUS|= Temp_OK; //0x1C7
@@ -132,20 +143,22 @@ void TempSensor_Read_OK(void)
 
 }
 
+// 温度传感器读取失败
 void TempSensor_Read_Fail(void)
 {
-	TEMP_SENSOR_STATUS|= Temp_Fail;
+	TEMP_SENSOR_STATUS |= Temp_Fail;
 	TEMP_SENSOR_STATUS &= ~Temp_OK;
 
 }
 
+// 适配器读取成功
 void CHG_Read_OK(void)
 {
 	CHG_STATUS|= Charge_OK;
 	CHG_STATUS &= ~Charge_Fail;	
 }
 
-
+// 适配器读取失败
 void CHG_Read_Fail(void)
 {
 	CHG_STATUS|= Charge_Fail;
@@ -159,7 +172,7 @@ void CHG_Read_Fail(void)
 //----------------------------------------------------------------------------
 const sSCS code asSCS1[] = 
 {
-	// SMBus protocol	Addr	Cmd		Data address	active flag and variable										byte cunt                       
+	// SMBus protocol	  Addr					Cmd				 Data 						address	active flag and variable								byte cunt                       
 
 	{ Cmd_ReadByte,		SmartBat_Addr,		BATCmd_RSOC,	    &BAT1_RSOC,         		B1_RSOC,		&SMBus1Flag1,	BAT1_Read_OK,   BAT1_Read_Fail, 0x00	},
 	{ Cmd_ReadWord,		SmartBat_Addr,		BATCmd_current,	    &BAT1_current_L,    		B1_C,			&SMBus1Flag1,	BAT1_Read_OK,   BAT1_Read_Fail, 0x00	},
@@ -175,6 +188,7 @@ const sSCS code asSCS1[] =
 	{ Cmd_ReadBlock, 	SmartBat_Addr,		BATCmd_Mname,		&BAT1_ManufacturerName,		B1_Mname,		&SMBus1Flag5,	BAT1_Read_OK,	BAT1_Read_Fail, 0x00	},		
 	{ Cmd_ReadBlock, 	SmartBat_Addr,		BATCmd_Dname,		&BAT1_DeviceName,			B1_Dname,		&SMBus1Flag5,	BAT1_Read_OK,	BAT1_Read_Fail, 0x00	},
 	{ Cmd_ReadWord, 	SmartBat_Addr,		BATCmd_DVolt,		&BAT1_DesignVoltage_L, 	    B1_Dvol,		&SMBus1Flag5,	BAT1_Read_OK,	BAT1_Read_Fail, 0x00	},		
+
 #if Lenovo_Support
 	{ Cmd_ReadWord, 	SmartBat_Addr,		BATCmd_CycleCount,	&BAT1_CycleCount_L,			B1_Cycle,		&SMBus1Flag1,	BAT1_Read_OK,	BAT1_Read_Fail, 0x00	},	
 	{ Cmd_ReadBlock,	SmartBat_Addr,		BATCmd_BatFW, 		&Bat1_FW,					B1_BatFW, 		&SMBus1Flag2,	BAT1_Read_OK,	BAT1_Read_Fail, 0x00	},
@@ -183,14 +197,14 @@ const sSCS code asSCS1[] =
 	{ Cmd_ReadWord,		SmartBat_Addr,		BATCmd_MfgF2, 	    &BAT1_MFGF2L,				B1_MFGF2,		&SMBus1Flag2,	BAT1_Read_Pass,	BAT1_Read_Fail, 0x00	},
 #endif
 
-	#if SmartCharger_Support
+#if SmartCharger_Support
 	{ Cmd_ReadWord, 	Charger_Addr,		_CMD_ChargerCurrent,			&R_CHARGE_CURRENT, 	Charge_CC,			&SMBus1Flag4,	CHG_Read_OK,	CHG_Read_Fail, 0x00	},
 	{ Cmd_ReadWord, 	Charger_Addr,		_CMD_ChargerVoltage, 			&R_CHARGE_VOLTAGE,	Charge_CV,			&SMBus1Flag4,	CHG_Read_OK,	CHG_Read_Fail, 0x00	},
 	{ Cmd_ReadWord, 	Charger_Addr,		_CMD_ChargerOption0,			&R_CHARGE_CTRL0,	Charge_Ctrl0,		&SMBus1Flag4,	CHG_Read_OK,	CHG_Read_Fail, 0x00	},
 	{ Cmd_ReadWord, 	Charger_Addr,		_CMD_ChargerOption1,			&R_CHARGE_CTRL1,	Charge_Ctrl1,		&SMBus1Flag4,	CHG_Read_OK,	CHG_Read_Fail, 0x00	},
 	{ Cmd_ReadWord, 	Charger_Addr,		_CMD_ChargerOption2,			&R_CHARGE_CTRL2,	Charge_Ctrl2,		&SMBus1Flag4,	CHG_Read_OK,	CHG_Read_Fail, 0x00	},
 	{ Cmd_ReadWord, 	Charger_Addr,		_CMD_ChargerInputCurrent,		&R_INPUT_CURRENT,	Charge_Input_CC,	&SMBus1Flag4,	CHG_Read_OK,	CHG_Read_Fail, 0x00	},
-	#endif
+#endif
 };
 
 //----------------------------------------------------------------------------
@@ -199,7 +213,6 @@ const sSCS code asSCS1[] =
 const sSCS code asSCS2[] = 
 {	
 	// For SMBus channel 2 debug
-	// SMBus protocol	Addr	Cmd		Data address	active flag and variable										byte cunt     
 	{ Cmd_ReadByte,	EMC1412_Addr,	ExternalTm,	&CpuTm,	tempSensorflag,	&SMBus1Flag5,	TempSensor_Read_OK,	TempSensor_Read_Fail, 0x00	},
 };
 
@@ -224,6 +237,7 @@ const sSCS code asSCS3[] =
 
 //----------------------------------------------------------------------------
 // To clear SMBus channel 1 variables
+// 这个函数没有用
 //----------------------------------------------------------------------------
 void ClearSMBus1Variables(void)
 {
@@ -232,6 +246,7 @@ void ClearSMBus1Variables(void)
 
 //----------------------------------------------------------------------------
 // To clear SMBus channel 2 variables
+// 这个函数没有用
 //----------------------------------------------------------------------------
 void ClearSMBus2Variables(void)
 {
@@ -240,6 +255,7 @@ void ClearSMBus2Variables(void)
 
 //----------------------------------------------------------------------------
 // To clear SMBus channel 3 variables
+// 这个函数没有用
 //----------------------------------------------------------------------------
 void ClearSMBus3Variables(void)
 {
@@ -248,9 +264,11 @@ void ClearSMBus3Variables(void)
 
 //----------------------------------------------------------------------------
 // SMBus Center Variables
+// 这个是 SMBUS 配置结构体
 //----------------------------------------------------------------------------
 const sSSC code asSSC[] = 
-{	   
+{	  
+	//  	索引  			超时			发送个数		是否使用			table size		服务函数flag			服务函数
  	{   &SMBus1index,  &SMBus1counter,	&SMBus1ByteCunt, &SMBus1InUsing,  &SMBus1TableSize, &F_Service_SMBus1,   service_smbus1  },	
  	{   &SMBus2index,  &SMBus2counter,	&SMBus2ByteCunt, &SMBus2InUsing,  &SMBus2TableSize, &F_Service_SMBus2,   service_smbus2  },
  	{   &SMBus3index,  &SMBus3counter,	&SMBus3ByteCunt, &SMBus3InUsing,  &SMBus3TableSize, &F_Service_SMBus3,   service_smbus3  },	
@@ -258,6 +276,7 @@ const sSSC code asSSC[] =
 
 //----------------------------------------------------------------------------
 // To calculate smbus table size.
+// 计算 SMBUS table 大小
 //----------------------------------------------------------------------------
 void CheckSMBusTableSize(void)
 {
@@ -268,6 +287,7 @@ void CheckSMBusTableSize(void)
 
 //----------------------------------------------------------------------------
 // To service SMBus 
+// 执行 SMBUS 服务函数
 //----------------------------------------------------------------------------
 void ServiceSMBus(void)
 {
@@ -293,6 +313,7 @@ void ServiceSMBus(void)
 //#pragma OT(8, SPEED)
 //----------------------------------------------------------------------------
 // SMBus channelx service function
+// SMBUS 通道服务函数
 //----------------------------------------------------------------------------
 void SMBusCenterSelection(BYTE channel) 
 {
@@ -601,6 +622,7 @@ void SMBusCenterSelection(BYTE channel)
 
 //----------------------------------------------------------------------------
 // SMBus service center   1ms base time
+// 通道选择函数
 //----------------------------------------------------------------------------
 void SMBusCenter(void) 
 {
@@ -613,6 +635,7 @@ void SMBusCenter(void)
 
 //----------------------------------------------------------------------------
 // Wait SMBus channel x free.
+// 等待 SMBUS 通道x 空闲
 //----------------------------------------------------------------------------
 void WatiSMBusCHxFree(BYTE channel)
 {
@@ -708,7 +731,7 @@ void InitSMBusChannel4(void)
 #endif
 
 //----------------------------------------------------------------------------
-// 	
+// 	初始化 SMBUS 参数
 //----------------------------------------------------------------------------
 void InitSMBus(void)
 {
@@ -724,10 +747,11 @@ void InitSMBus(void)
 }
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 接收 一个字节
 //----------------------------------------------------------------------------
 void PollSMBusReceiveByte(BYTE Channel,BYTE Addr)
 {	
+	// 检查 SMBUS 通道能不能被使用，这个判断是不能被使用
     if(CheckSMBusInterfaceCanbeUse(Channel, SMBus_AccessType_Table)==SMBus_CanNotUse)
     {
         *asSSC[Channel].inusing=0x00;       // SMBus interface can't be used.                           
@@ -742,10 +766,11 @@ void PollSMBusReceiveByte(BYTE Channel,BYTE Addr)
 }
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 发送 一个字节
 //----------------------------------------------------------------------------
 void PollSMBusSendByte(BYTE Channel,BYTE Addr,BYTE cmd)
 {	
+	// 检查 SMBUS 通道能不能被使用，这个判断是不能被使用
     if(CheckSMBusInterfaceCanbeUse(Channel, SMBus_AccessType_Table)==SMBus_CanNotUse)
     {
         *asSSC[Channel].inusing=0x00;       // SMBus interface can't be used.                           
@@ -761,7 +786,7 @@ void PollSMBusSendByte(BYTE Channel,BYTE Addr,BYTE cmd)
 }
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 读 一个字节
 //----------------------------------------------------------------------------
 void PollReadSMBusByte(BYTE Channel,BYTE Addr,BYTE Comd)
 {
@@ -780,7 +805,7 @@ void PollReadSMBusByte(BYTE Channel,BYTE Addr,BYTE Comd)
 }
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 写 一个字节
 //----------------------------------------------------------------------------
 void PollWriteSMBusByte(BYTE Channel,BYTE Addr,BYTE Comd,BYTE data1)
 {
@@ -800,7 +825,7 @@ void PollWriteSMBusByte(BYTE Channel,BYTE Addr,BYTE Comd,BYTE data1)
 }
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 读 一个字
 //----------------------------------------------------------------------------
 void PollReadSMBusWord(BYTE Channel,BYTE Addr,BYTE Comd)
 {
@@ -819,7 +844,7 @@ void PollReadSMBusWord(BYTE Channel,BYTE Addr,BYTE Comd)
 }
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 写 一个字
 //----------------------------------------------------------------------------
 void PollWriteSMBusWord(BYTE Channel,BYTE Addr,BYTE Comd,BYTE data1,BYTE data2)
 {
@@ -840,7 +865,7 @@ void PollWriteSMBusWord(BYTE Channel,BYTE Addr,BYTE Comd,BYTE data1,BYTE data2)
 }
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 读 block
 //----------------------------------------------------------------------------
 void PollReadSMBusBlock(BYTE Channel,BYTE Addr,BYTE Comd)
 {
@@ -858,7 +883,7 @@ void PollReadSMBusBlock(BYTE Channel,BYTE Addr,BYTE Comd)
 }	
 
 //----------------------------------------------------------------------------
-//
+// 轮询 SMBUS 写 block
 //----------------------------------------------------------------------------
 void PollWriteSMBusBlock(BYTE Channel,BYTE Addr,BYTE Comd,BYTE ByteCunt)
 {
@@ -878,6 +903,7 @@ void PollWriteSMBusBlock(BYTE Channel,BYTE Addr,BYTE Comd,BYTE ByteCunt)
 
 //----------------------------------------------------------------------------
 // SMBus channel 1 service function
+// SMBUS 通道1 服务函数
 //----------------------------------------------------------------------------
 void service_smbus1(void) 
 {
@@ -1015,6 +1041,7 @@ void service_smbus1(void)
 
 //----------------------------------------------------------------------------
 // SMBus channel 2 service function
+// SMBUS 通道1 服务函数
 //----------------------------------------------------------------------------
 void service_smbus2(void) 
 {
@@ -1152,6 +1179,7 @@ void service_smbus2(void)
 
 //----------------------------------------------------------------------------
 // SMBus channel 3 service function
+// SMBUS 通道1 服务函数
 //----------------------------------------------------------------------------
 void service_smbus3(void) 
 {
@@ -1291,6 +1319,7 @@ void service_smbus3(void)
 // The function of checking smbus need service
 // Note : 
 //      Always return SMBus_ClearService, if SMBusCenter is no use function.
+// 检查 SMBUS 需不需要服务
 //----------------------------------------------------------------------------
 BYTE CheckSMBusNeedService(void)
 {
@@ -1313,6 +1342,7 @@ BYTE CheckSMBusNeedService(void)
  * @return   - None
  * @note     - None
  *---------------------------------------------------------------------------*/
+// 这个函数没有被使用
 void Service_HI2C_Interface(void)
 {
     if (xHI2C_CHN > 0)

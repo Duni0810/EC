@@ -21,13 +21,13 @@ extern void AdapterOut(void);		//:LM
 
 struct sDebounce
 {
-	XBYTE	*REG;
-	BYTE	Flag;
-	XBYTE	*Cunter;
-	BYTE	Time;
-	FUNCT_PTR_V_V	press;
-	FUNCT_PTR_V_V	release;
-	FUNCT_PTR_V_V	nochange;	
+	XBYTE	*REG;				// ram空间的flag参数地址
+	BYTE	Flag;				// flag 位置
+	XBYTE	*Cunter;			// 像是消抖动用的计数器
+	BYTE	Time;				// 重装用的数值
+	FUNCT_PTR_V_V	press;		// 按键按下事件
+	FUNCT_PTR_V_V	release;	// 按键弹起事件
+	FUNCT_PTR_V_V	nochange;	// 按键保持事件
 };
 
 #endif
